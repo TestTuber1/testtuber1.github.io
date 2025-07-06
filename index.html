@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Site Template</title>
+
+  <!-- Google Fonts: Jaro (check if available, fallback included) -->
+  <link href="https://fonts.googleapis.com/css2?family=Jaro&display=swap" rel="stylesheet">
+
+  <style>
+    /* Base Styles */
+    body {
+      margin: 0;
+      font-family: 'Jaro', sans-serif;
+      background-color: #232121;
+      color: #F0F0F0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: #1e1e1e;
+      padding: 1rem;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    main {
+      flex: 1;
+      padding: 5rem 1rem 2rem; /* Top padding to accommodate fixed header */
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    .link-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .link-grid a {
+      display: inline-block;
+      text-align: center;
+      text-decoration: none;
+      color: #F0F0F0;
+      max-width: 150px;
+    }
+
+    .link-grid img {
+      width: 100%;
+      max-width: 150px;
+      border-radius: 8px;
+      border: 2px solid #444;
+      transition: transform 0.2s ease;
+    }
+
+    .link-grid img:hover {
+      transform: scale(1.05);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #555;
+      padding-bottom: 0.3rem;
+    }
+
+    .playable-link {
+      display: block;
+      margin: 2rem auto;
+      text-align: center;
+      background-color: #444;
+      padding: 1rem 2rem;
+      border-radius: 6px;
+      width: fit-content;
+      color: #F0F0F0;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+
+    .playable-link:hover {
+      background-color: #666;
+    }
+
+    footer {
+      background-color: #1e1e1e;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.2rem;
+      }
+
+      .link-grid {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>My Site</h1>
+  </header>
+
+  <main>
+    <!-- Section: External Links -->
+    <section>
+      <div class="section-title">External Links</div>
+      <div class="link-grid">
+        <a href="https://youtube.com" target="_blank">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube" />
+          <div>YouTube</div>
+        </a>
+        <!-- Add more links here -->
+      </div>
+    </section>
+
+    <!-- Section: Playable Games -->
+    <section>
+      <a class="playable-link" href="/playablegames">Go to Playable Games</a>
+    </section>
+
+    <!-- Add New Sections Here -->
+    <section>
+      <div class="section-title">Another Section</div>
+      <p>Content for another section goes here.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    Extra information or footer text goes here.
+  </footer>
+
+</body>
+</html>
