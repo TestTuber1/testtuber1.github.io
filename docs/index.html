@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TestTuber1</title>
 
-  <!-- Google Fonts: Jaro (check if available, fallback included) -->
+  <!-- Google Fonts: Jaro -->
   <link href="https://fonts.googleapis.com/css2?family=Jaro&display=swap" rel="stylesheet">
 
   <style>
-    /* Base Styles */
     body {
       margin: 0;
       font-family: 'Jaro', sans-serif;
@@ -34,81 +33,59 @@
     header h1 {
       margin: 0;
       font-size: 1.5rem;
+      text-align: center;
     }
 
     main {
       flex: 1;
-      padding: 5rem 1rem 2rem; /* Top padding to accommodate fixed header */
+      padding: 5rem 1rem 2rem;
     }
 
     section {
       margin-bottom: 2rem;
     }
 
-    .link-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .link-grid a {
-      display: inline-block;
-      text-align: center;
-      text-decoration: none;
-      color: #F0F0F0;
-      max-width: 150px;
-    }
-
-    .link-grid img {
-      width: 100%;
-      max-width: 150px;
-      border-radius: 8px;
-      border: 2px solid #444;
-      transition: transform 0.2s ease;
-    }
-
-    .link-grid img:hover {
-      transform: scale(1.05);
-    }
-
     .section-title {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       margin-bottom: 0.5rem;
       border-bottom: 1px solid #555;
       padding-bottom: 0.3rem;
+      text-align: center;
     }
 
-    .playable-link {
-      display: block;
-      margin: 2rem auto;
-      text-align: center;
-      background-color: #444;
-      padding: 1rem 2rem;
+    .footer-grid {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .footer-icon {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #333;
       border-radius: 6px;
-      width: fit-content;
       color: #F0F0F0;
-      text-decoration: none;
-      transition: background-color 0.2s;
-    }
-
-    .playable-link:hover {
-      background-color: #666;
-    }
-
-    footer {
-      background-color: #1e1e1e;
-      padding: 1rem;
+      font-size: 0.8rem;
       text-align: center;
-      font-size: 0.9rem;
+      padding: 0.5rem;
+      text-decoration: none;
+    }
+
+    .footer-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
     }
 
     @media (max-width: 600px) {
       header h1 {
         font-size: 1.2rem;
-      }
-
-      .link-grid {
-        justify-content: center;
       }
     }
   </style>
@@ -120,33 +97,36 @@
   </header>
 
   <main>
-    <!-- Section: External Links -->
+    <!-- About Me Section -->
     <section>
-      <div class="section-title">External Links</div>
-      <div class="link-grid">
-        <a href="https://www.youtube.com/@TestTuber1" target="_blank">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube" />
-          <div>YouTube</div>
-        </a>
-        <!-- Add more links here -->
-      </div>
+      <div class="section-title">About Me</div>
+      <p style="text-align: center;">
+        Hi, I'm TestTuber1 — a creator sharing content and projects I'm passionate about. Check out my work below!
+      </p>
     </section>
 
-    <!-- Section: Playable Games -->
+    <!-- Recent News Section -->
     <section>
-      <a class="playable-link" href="/playablegames">Playable Games</a>
+      <div class="section-title">Recent News</div>
+      <p style="text-align: center;">No recent updates yet. Stay tuned!</p>
     </section>
-
-    <!-- Add New Sections Here -->
-    <section>
-      <div class="section-title">Another Section</div>
-      <p>Content for another section goes here.</p>
-    </section>
-
   </main>
 
   <footer>
-    Extra information or footer text goes here.
+    <div class="footer-grid">
+      <a href="https://www.youtube.com/@TestTuber1" class="footer-icon" target="_blank">
+        <img src="youtube.png" alt="YouTube" onerror="this.style.display='none'; this.parentElement.textContent='YouTube';" />
+      </a>
+      <a href="https://www.instagram.com/testtuber1/" class="footer-icon" target="_blank">
+        <img src="instagram.png" alt="Instagram" onerror="this.style.display='none'; this.parentElement.textContent='Instagram';" />
+      </a>
+      <a href="https://testtuber1.itch.io/" class="footer-icon" target="_blank">
+        <img src="itchio.png" alt="itch.io" onerror="this.style.display='none'; this.parentElement.textContent='itch.io';" />
+      </a>
+      <a href="https://play.google.com/store/apps/dev?id=8178194123594631664" class="footer-icon" target="_blank">
+        <img src="googleplay.png" alt="Google Play" onerror="this.style.display='none'; this.parentElement.textContent='Google Play';" />
+      </a>
+    </div>
   </footer>
 
 </body>
