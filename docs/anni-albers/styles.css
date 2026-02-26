@@ -27,4 +27,15 @@ p.callout {
     font-size: 2re;
     line-height: auto;
     font-style: italic;
+    float: left;
+}
+
+#row1 p 
+#row3 p
+#row5 p
+#row7 p
+#row9 p
+#row11 p
+#row13 p{
+    margin-right: calc(100% / 6);
 }
