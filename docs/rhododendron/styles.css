@@ -111,8 +111,16 @@ p {
     }
 
     .section3 {
-        background-image: url("fullshot.jpeg");
-        height: 70vh;
+        background-image: none;
+        height: auto;
+        padding-top: 0;
+    }
+
+    .fullshot-desktop {
+    background-image: url("fullshot.jpeg");
+    background-size: cover;
+    background-position: center;
+    height: 70vh;
     }
 
 }
