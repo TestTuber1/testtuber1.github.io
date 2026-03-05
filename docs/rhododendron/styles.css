@@ -54,11 +54,65 @@ p {
     margin-top: 1rem;
 }
 
-.future-text {
-    font-size: 1.5rem;
-}
-
 /*
 -----------------------------------------------------------------------------------------------------------------------------------------
 */
 
+@media (min-width: 768px) {
+
+    body {
+        background-color: #2f6f3e;
+        color: white;
+    }
+
+    .image {
+        height: auto;
+        background-image: none;
+        padding: 3rem 1rem;
+    }
+
+    .section1 {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        align-items: center;
+    }
+
+    .section1::before {
+        content: "";
+        background-image: url("closeup2.jpeg");
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+    }
+
+    .section1::after {
+        content: "";
+        background-image: url("closeup1.jpeg");
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+    }
+
+    .overlay {
+        background: none;
+    }
+
+    h1 {
+        font-size: 3rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        font-style: italic;
+    }
+
+    p {
+        font-size: 1.4rem;
+    }
+
+    .section3 {
+        background-image: url("fullshot.jpeg");
+        height: 70vh;
+    }
+
+}
