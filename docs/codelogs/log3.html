@@ -16,6 +16,33 @@
 </head>
 
 <body>
+    <h1>Code Log 3: CSS Media Queries</h1>
 
+    <h2>What are Media Queries?</h2>
+
+    <p>
+        Media Queries are CSS code that allow you to apply styles to certain aspects of the screen by testing for various features. Some examples include: 
+    </p>
+
+    <ul>
+        <li>Height/Width - The height/width of the screen</li>
+        <li>Orientation - A test of whether the display is in landscape or portrait mode</li>
+        <li>Display-mode - The display mode of the web application (for example fullscreen)</li>
+        <li>Max Width - Used to apply CSS code if the screen is less than what is set to the max width (useful for cross-platform design)</li>
+    </ul>
+    
+    <h2>How Does a Media Query Work?</h2>
+
+    <p>
+        A Media Query is basically CSS’s version of an if statement. You use it to check for characteristics of the user’s device. It allows a website to be responsive to the users. Below is an example of usage to change background-colors for screens with 1200px or less.
+    </p>
+
+    <textarea rows="30" cols="150">
+        @media screen and (max-width: 1200px) {
+            body {
+                background-color: lightgrey;
+            }
+        }
+    </textarea>
 </body>
 </html>
