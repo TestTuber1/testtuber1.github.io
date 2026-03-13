@@ -103,14 +103,20 @@ li {
         margin: 0 auto;
     }
 
-    #title {
-        height: 420px;
+    .button {
+        margin: 0 0 20px 10px;
     }
+
+    #title {
+        height: 1000px;
+    }
+
     h3,
     ul,
     #steps {
         margin-top: 40px;
         align-items: center;
+        text-align: left;
     }
 
     #steps img {
