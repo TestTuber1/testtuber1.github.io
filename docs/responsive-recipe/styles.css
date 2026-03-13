@@ -71,8 +71,8 @@ li {
 }
 
 .step img {
-    width: auto;
-    height: auto;
+    width: 640;
+    height: 800;
     display: block;
 }
 
