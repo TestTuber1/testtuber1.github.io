@@ -104,11 +104,11 @@ li {
     }
 
     .button {
-        margin: 0 0 20px 10px;
+        margin-right: 20px;
     }
 
     #title {
-        height: 1000px;
+        max-height: 1100px;
     }
 
     h3,
@@ -116,11 +116,13 @@ li {
     #steps {
         margin-top: 40px;
         align-items: center;
+        margin-left: auto;
+        margin-right: auto;
         text-align: left;
     }
 
     #steps img {
-        max-width: 700px;
+        max-height: 1100px;
     }
 
     #acknowledgements {
