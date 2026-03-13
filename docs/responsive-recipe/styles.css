@@ -106,9 +106,9 @@ li {
     #title {
         height: 420px;
     }
-
+    h3,
+    ul,
     #steps {
-        clear: both;
         margin-top: 40px;
         align-items: center;
     }
