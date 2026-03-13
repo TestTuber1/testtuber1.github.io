@@ -2,7 +2,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    text-align: center;
 }
 
 body {
@@ -71,8 +70,8 @@ li {
 }
 
 .step img {
-    width: 640;
-    height: 800;
+    max-width: 100%;
+    height: auto;
     display: block;
 }
 
