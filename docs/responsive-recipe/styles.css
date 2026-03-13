@@ -10,6 +10,7 @@ body {
     background: #ffffff;
     color: #222;
     padding: 16px;
+    max-width: 375px;
 }
 
 .button {
@@ -73,6 +74,7 @@ li {
 
 .steps img {
     width: 100%;
+    height: auto;
     display: block;
 }
 
