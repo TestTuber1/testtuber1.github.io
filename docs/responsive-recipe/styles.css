@@ -72,9 +72,7 @@ li {
 }
 
 .steps img {
-    width: 80%;
-    max-width: 300px;
-    height: auto;
+    width: 100%;
     display: block;
 }
 
