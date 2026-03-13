@@ -64,13 +64,13 @@ li {
     gap: 24px;
 }
 
-.step p {
+.steps p {
     margin-bottom: 8px;
     text-align: left;
 }
 
-.step img {
-    max-width: 50%;
+.steps img {
+    max-width: 100%;
     height: auto;
     display: block;
 }
