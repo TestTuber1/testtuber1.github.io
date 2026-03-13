@@ -13,8 +13,9 @@ body {
 }
 
 .button {
-    display: inline-block;
-    margin-bottom: 16px;
+    display: block;
+    width: fit-content;
+    margin: 0 auto 20px auto;
     padding: 8px 14px;
     background: black;
     color: white;
@@ -29,6 +30,7 @@ body {
     color: white;
     padding: 40px 20px;
     margin-bottom: 24px;
+    text-align: center;
 }
 
 #title h1 {
@@ -59,37 +61,18 @@ li {
 #steps {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
 }
 
-#step1,
-#step2,
-#step3 {
-    min-height: 180px;
-    padding: 16px;
-    display: flex;
-    align-items: flex-end;
-    color: white;
-    background-size: cover;
-    background-position: center;
+.step p {
+    margin-bottom: 8px;
+    text-align: left;
 }
 
-#step1 {
-    background-image: url("step1.jpg");
-}
-
-#step2 {
-    background-image: url("step2.jpg");
-}
-
-#step3 {
-    background-image: url("step3.jpg");
-}
-
-#steps p {
-    background: rgba(0,0,0,0.6);
-    padding: 10px;
-    font-size: 14px;
+.step img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 #acknowledgements {
