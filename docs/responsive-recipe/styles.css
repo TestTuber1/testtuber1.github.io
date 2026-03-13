@@ -35,7 +35,7 @@ body {
 #title {
     background-image: url("title.jpg");
     background-size: cover;
-    background-position: center;
+    background-position: top center;
     color: white;
     height: 220px;
     padding: 40px 20px;
