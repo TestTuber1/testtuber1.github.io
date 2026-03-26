@@ -5,14 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Images</title>
     
-    <style>
-
-        textarea {
-            border: none;
-            padding: 5 px;
-            background-color: lightgray;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css" media="all">
 </head>
 
 <body>
@@ -21,33 +14,65 @@
     <h2>How Can Images be Used in HTML and CSS?</h2>
 
     <p>
-
+        Images in HTML are used with the &lt;img&gt; tag which embeds a foreground image into the document.
     </p>
 
-    <textarea rows="7" cols="45">
+    <img src="htmlimg.jpg">
 
-    </textarea>
+    <section id="cssimg">
+        <p>
+            Images in CSS are used as decoration, rather than being elements like their HTML counterparts. You can modify the background-image property to embed an image into the background of something in CSS.
+        </p>
+    </section>>
 
-    <textarea rows="7" cols="45">
+    <h2>What is the Difference Between the &lt;img&gt; tag and the background-image Property?</h2>
 
-    </textarea>
+    <p>
+        One is coded in HTML and one is coded in CSS to start with. Additionally, as mentioned before using the &lt;img&gt; tag makes the image an element of the page whereas the background-image property is purely decorative.
+    </p>
 
     <h2>What CSS Properties Affect Images?</h2>
 
-    <p>
-
-    </p>>
+    <ul>
+        <li>width/height - changes the dimensions of the image</li>
+        <li>margin - changes the spacing of the image</li>
+        <li>border - creates a border for the images</li>
+    </ul>
     
     <h2>What is the Difference Between Dimensions and Resolution?</h2>
 
     <p>
-        
+        Dimensions are referring to how many pixels are in the image, whereas resolution is the density of those pixels.
     </p>
 
     <h2>What About Image File Formats?</h2>
 
     <p>
-
+        Different image file formats have different use cases, here are some of the pros and cons for a few of them.
     </p>
+
+    <section>
+        <h3>Pros</h3>
+
+        <ul>
+            <li>Gif - Best for short animations</li>
+            <li>PNG - Best for transparent graphics</li>
+            <li>JPG/JPEG - Best for photos</li>
+            <li>WebP - Fastest format</li>
+            <li>SVG - Best for vector graphics</li>
+        </ul>
+    </section>
+    
+    <section>
+        <h3>Cons</h3>
+
+        <ul>
+            <li>Gif - No one can agree on how its pronounced</li>
+            <li>PNG - Larger file sizes</li>
+            <li>JPG/JPEG - Not good with text</li>
+            <li>WebP - Not good in older browsers</li>
+            <li>Not good for complex photos</li>
+        </ul>
+    </section>
 </body>
 </html>
