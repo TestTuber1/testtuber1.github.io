@@ -49,6 +49,7 @@ body {
 #sites {
     color: black;
     align-items: flex-end;
+    text-align: bottom;
 }
 
 #recipe1 {
