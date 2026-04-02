@@ -305,13 +305,13 @@ li {
     }
 
     .card {
-    width: 400px;
+    flex: 1 1 300px;
     aspect-ratio: 1 / 1;
     padding: 10px;
     position: relative;
     }
 
     #home {
-        width: 150%;
+        width: 100%;
     }
 }
