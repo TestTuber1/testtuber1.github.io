@@ -15,6 +15,11 @@ body {
 
 /*-------------------------------------------------HOME------------------------------------------------------------*/
 
+#sites {
+    color: black;
+    align-items: flex-end;
+}
+
 .card {
     display: flex;
     flex-direction: column;
@@ -44,15 +49,6 @@ body {
 
 .card:active {
     transform: scale(0.98);
-}
-
-#sites {
-    color: black;
-    text-align: center;
-}
-
-#recipes {
-    text-align: center;
 }
 
 #recipe1 {
