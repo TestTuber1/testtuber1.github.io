@@ -53,6 +53,15 @@ body {
     align-items: center;
 }
 
+#DTC {
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+}
+
 #recipe1 {
     background-image: url('title.jpg');
 }
