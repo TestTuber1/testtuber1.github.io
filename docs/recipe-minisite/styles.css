@@ -302,5 +302,12 @@ li {
     gap: 20px;
     flex-wrap: wrap;
     padding: 15px;
-}
+    }
+
+    .card {
+    width: 200px;
+    aspect-ratio: 1 / 1;
+    padding: 10px;
+    position: relative;
+    }
 }
