@@ -48,8 +48,8 @@ body {
 
 #sites .card{
     color: black;
-    align-items: flex-end;
-    text-align: center;
+    align-items: center;
+    text-align: bottom;
 }
 
 #recipe1 {
