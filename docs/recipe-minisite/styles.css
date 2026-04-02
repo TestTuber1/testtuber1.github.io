@@ -301,6 +301,7 @@ li {
     gap: 20px;
     flex-wrap: wrap;
     padding: 15px;
+    justify-content: center;
     }
 
     .card {
@@ -311,6 +312,6 @@ li {
     }
 
     #home {
-        max-width: 1200px;
+        max-width: 1500px;
     }
 }
