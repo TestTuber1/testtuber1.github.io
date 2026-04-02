@@ -105,6 +105,16 @@ nav ul ul li {
     text-align: center;
 }
 
+#stitle {
+    background-image: url("images/stitle.webp");
+    background-size: cover;
+    background-position: top center;
+    color: white;
+    height: 360px;
+    padding: 40px 20px;
+    margin-bottom: 24px;
+    text-align: center;
+}
 
 #title h1 {
     font-size: 28px;
@@ -177,6 +187,10 @@ li {
     }
 
     #octitle {
+        height: 1100px;
+    }
+
+    #stitle {
         height: 1100px;
     }
     
