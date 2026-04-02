@@ -13,6 +13,53 @@ body {
     max-width: 375px;
 }
 
+/*-------------------------------------------------HOME------------------------------------------------------------*/
+
+.card {
+    display: block;
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: white;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Tap/hover effect */
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.card:active {
+    transform: scale(0.98);
+}
+
+#recipe1 {
+    background-image: url('title.jpg');
+}
+
+#recipe2 {
+    background-image: url('images/octitle.jpg');
+}
+
+#recipe3 {
+    background-image: url('images/stitle.webp');
+}
+
+#site1 {
+    background-image: url('images/site1.png');
+}
+
+#site2 {
+    background-image: url('images/site2.png');
+}
+
+#site3 {
+    background-image: url('images/site3.png');
+}
 /*-------------------------------------------------NAV BAR------------------------------------------------------------*/
 
 nav {
