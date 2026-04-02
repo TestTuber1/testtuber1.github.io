@@ -147,8 +147,7 @@ li {
 
 #steps img {
     width: 100%;
-    object-fit: cover;
-    height: auto;
+    height: 360px;
     display: block;
 }
 
@@ -203,7 +202,8 @@ li {
     }
 
     #steps img {
-        max-height: 1100px;
+        height: 1100px;
+        width: 100%;
     }
 
     #acknowledgements {
