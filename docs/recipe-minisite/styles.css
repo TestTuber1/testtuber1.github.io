@@ -138,6 +138,7 @@ li {
     gap: 24px;
     max-width: 100%;
     height: auto;
+    object-fit: cover;
 }
 
 .steps p {
@@ -172,6 +173,10 @@ li {
     }
 
     #title {
+        height: 1100px;
+    }
+
+    #octitle {
         height: 1100px;
     }
     
