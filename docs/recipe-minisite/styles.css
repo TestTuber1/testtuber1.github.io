@@ -46,10 +46,10 @@ body {
     transform: scale(0.98);
 }
 
-#sites {
+#sites .card{
     color: black;
     align-items: flex-end;
-    text-align: bottom;
+    text-align: center;
 }
 
 #recipe1 {
