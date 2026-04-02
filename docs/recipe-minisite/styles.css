@@ -312,6 +312,6 @@ li {
     }
 
     #home {
-        max-width: 1500px;
+        width: 1500px;
     }
 }
