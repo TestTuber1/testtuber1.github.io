@@ -26,11 +26,14 @@ body {
     padding: 20px;
     border-radius: 12px;
     text-decoration: none;
-    color: white;
+    color: black;
 
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     aspect-ratio: 1 / 1;
+
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .card:hover {
@@ -44,6 +47,11 @@ body {
 
 #sites {
     color: black;
+    text-align: center;
+}
+
+#recipes {
+    text-align: center;
 }
 
 #recipe1 {
