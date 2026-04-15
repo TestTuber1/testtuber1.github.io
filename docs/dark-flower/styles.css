@@ -61,8 +61,13 @@ p {
 @media (min-width: 768px) {
 
     body {
-        background-color: #2f6f3e;
-        color: white;
+        background-color: white;
+        color: #2f6f3e;
+    }
+
+    body.darkMode {
+    background-color: #2f6f3e;
+    color: white;
     }
 
     .image {
