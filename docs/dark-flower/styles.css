@@ -72,6 +72,8 @@ p {
 }
 
 #toggleDarkMode {
+    display: block;
+    margin: 2rem auto;
     padding: 0.8rem 1.5rem;
     font-size: 1.2rem;
     border: none;
