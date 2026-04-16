@@ -70,15 +70,15 @@ p {
     color: white;
     }
 
-    body.darkMode .image{
-        color: white;
-    }
-
     .image {
         height: auto;
         background-image: none;
         padding: 3rem 1rem;
         color: #2f6f3e;
+    }
+
+    body.darkMode .image{
+        color: white;
     }
 
     .section1 {
