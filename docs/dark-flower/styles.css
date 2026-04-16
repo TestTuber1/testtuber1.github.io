@@ -70,7 +70,7 @@ p {
     color: white;
     }
 
-    image.darkMode {
+    body.darkMode .image{
         color: #2f6f3e;
     }
 
