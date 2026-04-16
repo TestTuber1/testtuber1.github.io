@@ -6,6 +6,7 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
 }
 
 .image {
@@ -23,6 +24,10 @@ body {
 
 body.darkMode .image {
     filter: brightness(0.6);
+}
+
+body.darkMode {
+    background-color: #2f6f3e;
 }
 
 .section1 {
