@@ -21,6 +21,10 @@ body {
     color: white;
 }
 
+body.darkMode .image {
+    filter: brightness(0.6);
+}
+
 .section1 {
     background-image: url("closeup2.jpeg");
 }
