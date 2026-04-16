@@ -65,6 +65,8 @@ p {
 
 .button-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     margin: 2rem 0;
 }
@@ -75,6 +77,13 @@ p {
     border: none;
     border-radius: 12px;
     cursor: pointer;
+    background-color: #2f6f3e;
+    color: white;
+}
+
+body.darkMode #toggleDarkMode {
+    background-color: white;
+    color: #2f6f3e;
 }
 
 /*
