@@ -71,13 +71,14 @@ p {
     }
 
     body.darkMode .image{
-        color: #2f6f3e;
+        color: white;
     }
 
     .image {
         height: auto;
         background-image: none;
         padding: 3rem 1rem;
+        color: #2f6f3e;
     }
 
     .section1 {
