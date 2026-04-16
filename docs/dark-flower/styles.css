@@ -70,6 +70,10 @@ p {
     color: white;
     }
 
+    image.darkMode {
+        color: #2f6f3e;
+    }
+
     .image {
         height: auto;
         background-image: none;
