@@ -52,6 +52,19 @@ body {
       background-attachment: fixed;
     }
 
+    .toconqueredcraterfromghosttown {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toconqueredcraterfromghosttown img {
+  width: 10vh;
+  display: block;
+}
+
   /*------------------------------------------------------------ Lakeside Cabin -------------------------------------------*/
 
 #lakesidecabin {
@@ -63,3 +76,16 @@ body {
       background-repeat: no-repeat;
       background-attachment: fixed;
     }
+
+    .toconqueredcraterfromlakesidecabin {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toconqueredcraterfromlakesidecabin img {
+  width: 10vh;
+  display: block;
+}
