@@ -12,7 +12,7 @@ body {
       background-attachment: fixed;
     }
 
-#toghosttown {
+.toghosttown {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -20,7 +20,7 @@ body {
   z-index: 2;
 }
 
-#toghosttown img {
+.toghosttown img {
   width: 10vh;
   display: block;
 }
