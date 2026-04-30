@@ -24,3 +24,16 @@ body {
   width: 10vh;
   display: block;
 }
+
+.tolakesidecabin {
+  position: absolute;
+  top: 80%;
+  left: 30%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tolakesidecabin img {
+  width: 10vh;
+  display: block;
+}
