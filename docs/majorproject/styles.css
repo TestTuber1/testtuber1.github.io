@@ -2,6 +2,8 @@ body {
   overflow: hidden;
 }
 
+/*------------------------------------------------------------ CONQUERED CRATER -------------------------------------------*/
+
 #conqueredcrater {
   position: relative;
       height: 100vh;
@@ -37,3 +39,27 @@ body {
   width: 10vh;
   display: block;
 }
+
+/*------------------------------------------------------------ GHOST TOWN -------------------------------------------*/
+
+#ghosttown {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/ghosttown.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+  /*------------------------------------------------------------ Lakeside Cabin -------------------------------------------*/
+
+#ghosttown {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/lakesidecabin.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
