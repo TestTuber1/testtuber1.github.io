@@ -4,6 +4,10 @@ html, body {
   overflow: hidden;
 }
 
+[data-scroll-container] {
+  overflow: hidden;
+}
+
 .panel {
   min-height: 100dvh;
   display: flex;
@@ -13,7 +17,7 @@ html, body {
 }
 
 img {
-  width: 80%;
+  width: 75%;
   display: block;
 }
 
