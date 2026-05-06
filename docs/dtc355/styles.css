@@ -1,16 +1,18 @@
+body {
+    text-align: center;
+    justify-content: center;
+}
+
 .image-row {
   display: flex;
-  gap: 10px;
+  gap: 20px;
   flex-wrap: wrap;
+  
 }
 
 .image-row img {
-  width: 30vh;
+  width: 50vh;
   height: auto;
-}
-
-body {
-    text-align: center;
 }
 
 /*-------------------------------------------------NAV BAR------------------------------------------------------------*/
