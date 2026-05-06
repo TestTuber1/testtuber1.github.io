@@ -1,7 +1,6 @@
 html, body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 [data-scroll-container] {
@@ -41,13 +40,4 @@ img {
 
 .container {
     height: 100dvh;
-}
-
-@media (max-width: 768px) { /*------------------- MOBILE --------------------------*/
-  .container {
-    height: 100dvh;
-    -webkit-overflow-scrolling: touch;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-  }
 }
