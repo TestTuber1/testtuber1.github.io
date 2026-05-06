@@ -4,6 +4,11 @@
   flex-wrap: wrap;
 }
 
+.image-row img {
+  width: 30vh;
+  height: auto;
+}
+
 body {
     text-align: center;
 }
