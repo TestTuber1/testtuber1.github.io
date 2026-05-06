@@ -9,6 +9,12 @@ body {
   flex-wrap: wrap;
 }
 
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .image-row img {
   width: 50vh;
   height: auto;
