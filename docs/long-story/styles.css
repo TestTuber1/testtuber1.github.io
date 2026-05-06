@@ -42,5 +42,6 @@ img {
 @media (max-width: 768px) { /*------------------- MOBILE --------------------------*/
   .container {
     height: 100dvh;
+    -webkit-overflow-scrolling: touch;
   }
 }
