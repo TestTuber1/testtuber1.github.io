@@ -9,7 +9,7 @@ html, body {
 }
 
 .panel {
-  height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,9 +39,15 @@ img {
   opacity: 1;
 }
 
+.container {
+    height: 100dvh;
+}
+
 @media (max-width: 768px) { /*------------------- MOBILE --------------------------*/
   .container {
     height: 100dvh;
     -webkit-overflow-scrolling: touch;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
   }
 }
