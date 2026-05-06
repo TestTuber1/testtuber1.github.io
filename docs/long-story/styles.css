@@ -21,15 +21,6 @@ img {
   display: block;
 }
 
-.text-panel {
-  position: absolute;
-  bottom: 10%;
-  left: 10%;
-  background: rgba(0,0,0,0.6);
-  color: white;
-  padding: 2rem;
-}
-
 .fade {
   opacity: 0;
   transition: opacity 0.6s ease;
