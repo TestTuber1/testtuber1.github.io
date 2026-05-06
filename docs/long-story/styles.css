@@ -9,7 +9,7 @@ html, body {
 }
 
 .panel {
-  min-height: 100dvh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,16 +20,6 @@ img {
   width: 75%;
   display: block;
 }
-
-.fade {
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-.fade.is-inview {
-  opacity: 1;
-}
-
 .container {
-    height: 100dvh;
+    height: 100vh;
 }
