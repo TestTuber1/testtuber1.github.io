@@ -38,3 +38,9 @@ img {
 .fade.is-inview {
   opacity: 1;
 }
+
+@media (max-width: 768px) { /*------------------- MOBILE --------------------------*/
+  .container {
+    height: 100dvh;
+  }
+}
