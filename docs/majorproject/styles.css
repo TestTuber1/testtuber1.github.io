@@ -213,8 +213,8 @@ a {
 
 .toghosttownfromupbeatuptown {
   position: absolute;
-  top: 64%;
-  left: 45%;
+  top: 80%;
+  left: 43%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -226,8 +226,8 @@ a {
 
 .toyourhouse {
   position: absolute;
-  top: 89%;
-  left: 13%;
+  top: 50%;
+  left: 55%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -239,8 +239,8 @@ a {
 
 .todogpark {
   position: absolute;
-  top: 89%;
-  left: 13%;
+  top: 70%;
+  left: 70%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
