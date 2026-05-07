@@ -58,7 +58,7 @@ a {
       background-attachment: fixed;
     }
 
-    .toconqueredcraterfromghosttown {
+.toconqueredcraterfromghosttown {
   position: absolute;
   top: 80%;
   left: 50%;
@@ -67,6 +67,185 @@ a {
 }
 
 .toconqueredcraterfromghosttown img {
+  width: 10vh;
+  display: block;
+}
+
+.todowntown {
+  position: absolute;
+  top: 46%;
+  left: 32%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.todowntown img {
+  width: 10vh;
+  display: block;
+}
+
+.toupbeatuptown {
+  position: absolute;
+  top: 90%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toupbeatuptown img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ Freaky Forest -------------------------------------------*/
+
+#freakyforest {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/freakyforest.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.toconqueredcraterfromfreakyforest {
+  position: absolute;
+  top: 46%;
+  left: 32%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toconqueredcraterfromfreakyforest img {
+  width: 10vh;
+  display: block;
+}
+
+.tolakesidecabin {
+  position: absolute;
+  top: 79%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tolakesidecabin img {
+  width: 10vh;
+  display: block;
+}
+
+.tomountend {
+  position: absolute;
+  top: 24%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tomountend img {
+  width: 10vh;
+  display: block;
+}
+
+  /*------------------------------------------------------------ Downtown -------------------------------------------*/
+
+#downtown {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/downtown.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.toghosttownfromdowntown {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toghosttownfromdowntown img {
+  width: 10vh;
+  display: block;
+}
+
+.todaytimesaloon {
+  position: absolute;
+  top: 24%;
+  left: 89%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.todaytimesaloon img {
+  width: 10vh;
+  display: block;
+}
+
+.togeneralstore {
+  position: absolute;
+  top: 56%;
+  left: 34%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.togeneralstore img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ Upbeat Uptown -------------------------------------------*/
+
+#upbeatuptown {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/upbeatuptown.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.toghosttownfromupbeatuptown {
+  position: absolute;
+  top: 64%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toghosttownfromupbeatuptown img {
+  width: 10vh;
+  display: block;
+}
+
+.toyourhouse {
+  position: absolute;
+  top: 89%;
+  left: 13%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toyourhouse img {
+  width: 10vh;
+  display: block;
+}
+
+.todogpark {
+  position: absolute;
+  top: 89%;
+  left: 13%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.todogpark img {
   width: 10vh;
   display: block;
 }
@@ -83,7 +262,7 @@ a {
       background-attachment: fixed;
     }
 
-    .toconqueredcraterfromlakesidecabin {
+.tofreakyforestfromlakesidecabin {
   position: absolute;
   top: 80%;
   left: 50%;
@@ -91,7 +270,246 @@ a {
   z-index: 2;
 }
 
-.toconqueredcraterfromlakesidecabin img {
+.tofreakyforestfromlakesidecabin img {
+  width: 10vh;
+  display: block;
+}
+
+.tolakebed {
+  position: absolute;
+  top: 24%;
+  left: 89%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tolakebed img {
+  width: 10vh;
+  display: block;
+}
+
+.tohauntedattic {
+  position: absolute;
+  top: 56%;
+  left: 34%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tohauntedattic img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ Mount End -------------------------------------------*/
+
+#mountend {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/mountend.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.tofreakyforestfrommountend {
+  position: absolute;
+  top: 64%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tofreakyforestfrommountend img {
+  width: 10vh;
+  display: block;
+}
+
+.tobarecave {
+  position: absolute;
+  top: 89%;
+  left: 13%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tobarecave img {
+  width: 10vh;
+  display: block;
+}
+
+  /*------------------------------------------------------------ Daytime Saloon -------------------------------------------*/
+
+#daytimesaloon {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/daytimesaloon.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.todowntownfromdaytimesaloon {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.todowntownfromdaytimesaloon img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ General Store -------------------------------------------*/
+
+#generalstore {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/generalstore.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.todowntownfromgeneralstore {
+  position: absolute;
+  top: 64%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.todowntownfromgeneralstore img {
+  width: 10vh;
+  display: block;
+}
+
+  /*------------------------------------------------------------ Your House -------------------------------------------*/
+
+#yourhouse {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/yourhouse.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.toupbeatuptownfromyourhouse {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toupbeatuptownfromyourhouse img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ Dog Park -------------------------------------------*/
+
+#dogpark {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/dogpark.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.toupbeatuptownfromdogpark {
+  position: absolute;
+  top: 64%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.toupbeatuptownfromdogpark img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ Lake Bed -------------------------------------------*/
+
+#lakebed {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/lakebed.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.tolakesidecabinfromlakebed {
+  position: absolute;
+  top: 64%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tolakesidecabinfromlakebed img {
+  width: 10vh;
+  display: block;
+}
+
+  /*------------------------------------------------------------ Haunted Attic -------------------------------------------*/
+
+#hauntedattic {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/hauntedattic.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.lakesidecabinfromhauntedattic {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.lakesidecabinfromhauntedattic img {
+  width: 10vh;
+  display: block;
+}
+
+ /*------------------------------------------------------------ Bare Cave -------------------------------------------*/
+
+#barecave {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/barecave.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+.tomountendfrombarecave {
+  position: absolute;
+  top: 64%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.tomountendfrombarecave img {
   width: 10vh;
   display: block;
 }
