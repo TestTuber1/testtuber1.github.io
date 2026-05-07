@@ -353,8 +353,8 @@ a {
 
 .todowntownfromdaytimesaloon {
   position: absolute;
-  top: 80%;
-  left: 50%;
+  top: 90%;
+  left: 45%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -378,7 +378,7 @@ a {
 
 .todowntownfromgeneralstore {
   position: absolute;
-  top: 64%;
+  top: 80%;
   left: 45%;
   transform: translate(-50%, -50%);
   z-index: 2;
