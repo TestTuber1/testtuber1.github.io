@@ -315,8 +315,8 @@ a {
 
 .tofreakyforestfrommountend {
   position: absolute;
-  top: 15%;
-  left: 55%;
+  top: 85%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -328,7 +328,7 @@ a {
 
 .tobarecave {
   position: absolute;
-  top: 30%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
