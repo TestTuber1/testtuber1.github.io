@@ -428,8 +428,8 @@ a {
 
 .toupbeatuptownfromdogpark {
   position: absolute;
-  top: 64%;
-  left: 45%;
+  top: 75%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
