@@ -264,7 +264,7 @@ a {
 
 .tofreakyforestfromlakesidecabin {
   position: absolute;
-  top: 80%;
+  top: 85%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
@@ -277,8 +277,8 @@ a {
 
 .tolakebed {
   position: absolute;
-  top: 24%;
-  left: 89%;
+  top: 65%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -291,7 +291,7 @@ a {
 .tohauntedattic {
   position: absolute;
   top: 56%;
-  left: 34%;
+  left: 65%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -453,8 +453,8 @@ a {
 
 .tolakesidecabinfromlakebed {
   position: absolute;
-  top: 64%;
-  left: 45%;
+  top: 75%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
