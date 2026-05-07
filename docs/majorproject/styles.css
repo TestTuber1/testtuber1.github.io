@@ -89,3 +89,15 @@ body {
   width: 10vh;
   display: block;
 }
+
+/*------------------------------------------------------------ The Peak -------------------------------------------*/
+
+#thepeak {
+  position: relative;
+      height: 100vh;
+      background-image: url('backgrounds/thepeak.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
