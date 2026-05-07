@@ -33,7 +33,7 @@ a {
   display: block;
 }
 
-.tolakesidecabin {
+.tofreakyforest {
   position: absolute;
   top: 80%;
   left: 30%;
@@ -41,7 +41,7 @@ a {
   z-index: 2;
 }
 
-.tolakesidecabin img {
+.tofreakyforest img {
   width: 10vh;
   display: block;
 }
@@ -60,8 +60,8 @@ a {
 
 .toconqueredcraterfromghosttown {
   position: absolute;
-  top: 80%;
-  left: 50%;
+  top: 85%;
+  left: 55%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -73,8 +73,8 @@ a {
 
 .todowntown {
   position: absolute;
-  top: 46%;
-  left: 32%;
+  top: 60%;
+  left: 40%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -86,8 +86,8 @@ a {
 
 .toupbeatuptown {
   position: absolute;
-  top: 90%;
-  left: 80%;
+  top: 55%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
