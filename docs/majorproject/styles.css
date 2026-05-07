@@ -111,8 +111,8 @@ a {
 
 .toconqueredcraterfromfreakyforest {
   position: absolute;
-  top: 46%;
-  left: 32%;
+  top: 13%;
+  left: 70%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -124,8 +124,8 @@ a {
 
 .tolakesidecabin {
   position: absolute;
-  top: 79%;
-  left: 50%;
+  top: 50%;
+  left: 85%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -137,8 +137,8 @@ a {
 
 .tomountend {
   position: absolute;
-  top: 24%;
-  left: 75%;
+  top: 40%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -315,8 +315,8 @@ a {
 
 .tofreakyforestfrommountend {
   position: absolute;
-  top: 64%;
-  left: 45%;
+  top: 15%;
+  left: 55%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -328,8 +328,8 @@ a {
 
 .tobarecave {
   position: absolute;
-  top: 89%;
-  left: 13%;
+  top: 30%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
@@ -476,7 +476,7 @@ a {
       background-attachment: fixed;
     }
 
-.lakesidecabinfromhauntedattic {
+.tolakesidecabinfromhauntedattic {
   position: absolute;
   top: 80%;
   left: 50%;
@@ -484,7 +484,7 @@ a {
   z-index: 2;
 }
 
-.lakesidecabinfromhauntedattic img {
+.tolakesidecabinfromhauntedattic img {
   width: 10vh;
   display: block;
 }
@@ -503,8 +503,8 @@ a {
 
 .tomountendfrombarecave {
   position: absolute;
-  top: 64%;
-  left: 45%;
+  top: 35%;
+  left: 70%;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
