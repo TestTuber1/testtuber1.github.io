@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>rect{fill:#0a66c2}g{fill:#fff}@media (prefers-color-scheme:dark){rect{fill:#70b5f9}g{fill:#121211}}</style>
+  <rect height="64" rx="14" width="64"/>
+  <g>
+    <path d="M-17 -240V-186H-3Q34 -186 63.0 -169.5Q92 -153 109.5 -113.5Q127 -74 127 -5V602Q127 643 108.5 654.0Q90 665 64 665H33V714H358V665H327Q300 665 281.5 653.5Q263 642 263 598V-4Q263 -94 228.0 -145.5Q193 -197 135.5 -218.5Q78 -240 12 -240Z" transform="translate(17.52 39.23) scale(0.03052 -0.03052)"/>
+    <path d="M152 0V49H187Q213 49 231.5 60.0Q250 71 250 115V657H164Q119 657 102.0 636.0Q85 615 81 582L75 527H14L19 714H619L624 527H563L556 582Q553 615 535.5 636.0Q518 657 473 657H387V116Q387 72 405.0 60.5Q423 49 450 49H485V0Z" transform="translate(27.96 39.23) scale(0.03052 -0.03052)"/>
+  </g>
+</svg>
