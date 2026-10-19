@@ -1,0 +1,3173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
+    <title>Tetra Pong</title>
+    <meta name="description" content="Tetra Pong combines classic Pong deflection with Tetris grid-snapped blocks, directional queue mechanics, and expanding territory." />
+    <meta property="og:title" content="Tetra Pong - Hybrid Arcade Pong & Tetris" />
+    <meta property="og:description" content="Tetra Pong combines classic Pong deflection with Tetris grid-snapped blocks, directional queue mechanics, and expanding territory." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Global error suppression for sandboxed iframe & cross-origin runtime environments
+      (function() {
+        var suppress = function(e) {
+          if (e) {
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+            if (e.stopPropagation) e.stopPropagation();
+          }
+          return true;
+        };
+        window.addEventListener('error', suppress, true);
+        window.addEventListener('unhandledrejection', suppress, true);
+        window.onerror = function() { return true; };
+      })();
+    </script>
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        margin: 0;
+        padding: 0;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #05060b;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #game-wrapper {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        overflow: hidden;
+      }
+
+      #game-cabinet {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100vw;
+        height: 100vh;
+        max-width: calc(100vh * (1200 / 768));
+        max-height: calc(100vw * (768 / 1200));
+        background: #0a0d17;
+        box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(6, 182, 212, 0.2);
+        overflow: hidden;
+      }
+
+      /* Playfield Stage (holds Canvas and overlays) */
+      #playfield-stage {
+        position: relative;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      canvas#gameCanvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        cursor: default;
+      }
+
+      /* UI Overlay Layer */
+      .ui-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .interactive {
+        pointer-events: auto;
+      }
+
+      /* Arcade Title Emblem matching 1 Player & 2 Player buttons visual theme */
+      .title-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 28px;
+        text-align: center;
+      }
+
+      .logo-title {
+        font-size: clamp(40px, 6.5vw, 72px);
+        font-weight: 900;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #38bdf8;
+        text-shadow: 0 0 16px rgba(56, 189, 248, 0.85), 0 0 32px rgba(56, 189, 248, 0.45);
+      }
+
+      .logo-title span {
+        display: inline-block;
+        transition: transform 0.2s ease;
+      }
+
+      /* Mode & Menu Buttons */
+      .menu-btn {
+        background: rgba(15, 23, 42, 0.85);
+        border: 2px solid #38bdf8;
+        color: #ffffff;
+        font-size: clamp(15px, 1.8vw, 18px);
+        font-weight: 700;
+        letter-spacing: 2px;
+        padding: 12px 32px;
+        margin: 6px;
+        min-width: 240px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.3), inset 0 0 8px rgba(56, 189, 248, 0.2);
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .menu-btn:hover {
+        background: #38bdf8;
+        color: #090d16;
+        box-shadow: 0 0 22px rgba(56, 189, 248, 0.9), inset 0 0 12px #fff;
+        transform: translateY(-2px);
+      }
+
+      .menu-btn:active {
+        transform: translateY(1px);
+      }
+
+      .menu-btn.alt {
+        border-color: #c084fc;
+        box-shadow: 0 0 10px rgba(192, 132, 252, 0.3), inset 0 0 8px rgba(192, 132, 252, 0.2);
+      }
+
+      .menu-btn.alt:hover {
+        background: #c084fc;
+        color: #090d16;
+        box-shadow: 0 0 22px rgba(192, 132, 252, 0.9);
+      }
+
+      .menu-btn.secondary {
+        border-color: #64748b;
+        color: #cbd5e1;
+        font-size: 14px;
+        padding: 8px 20px;
+        min-width: 170px;
+        box-shadow: none;
+      }
+
+      .menu-btn.secondary:hover {
+        background: #64748b;
+        color: #fff;
+        border-color: #94a3b8;
+      }
+
+      /* Modal Popups (Settings & Rules) */
+      .modal-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(4, 7, 14, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+
+      .modal-card {
+        background: #0f172a;
+        border: 2px solid #38bdf8;
+        border-radius: 8px;
+        padding: 24px;
+        max-width: 580px;
+        width: 90%;
+        box-shadow: 0 0 35px rgba(56, 189, 248, 0.4);
+        max-height: 88vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #1e293b;
+        padding-bottom: 12px;
+      }
+
+      .modal-title {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        color: #38bdf8;
+        text-transform: uppercase;
+        text-align: center;
+        width: 100%;
+      }
+
+      .modal-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 26px;
+        cursor: pointer;
+        padding: 0 8px;
+        line-height: 1;
+      }
+
+      .modal-close:hover {
+        color: #fff;
+      }
+
+      .setting-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .setting-label {
+        font-weight: 600;
+        font-size: 15px;
+        color: #e2e8f0;
+      }
+
+      /* Uniform Symmetrical Setting Buttons */
+      .pill-group {
+        display: flex;
+        gap: 8px;
+      }
+
+      .pill-btn {
+        background: #1e293b;
+        border: 1px solid #475569;
+        color: #94a3b8;
+        width: 92px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .pill-btn.active {
+        background: #38bdf8;
+        color: #0f172a;
+        border-color: #38bdf8;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      }
+
+      .range-slider {
+        accent-color: #38bdf8;
+        cursor: pointer;
+        width: 292px;
+        height: 38px;
+      }
+
+      /* 3rd-Grade Simplified Rules Styling */
+      .rules-content {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 8px 0;
+      }
+
+      .rule-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #e2e8f0;
+        font-weight: 500;
+      }
+
+      .rule-bullet {
+        color: #38bdf8;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      /* Minimal End Screen (100% Solid Pure White Viewport) */
+      body[data-state="gameover"],
+      body[data-state="gameover"] #game-wrapper,
+      body[data-state="gameover"] #game-cabinet,
+      body[data-state="gameover"] #playfield-stage {
+        background: #ffffff !important;
+      }
+
+      .game-over-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        z-index: 40;
+        pointer-events: auto;
+      }
+
+      .game-over-box {
+        background: rgba(255, 255, 255, 0.96);
+        border: 3px solid #0f172a;
+        border-radius: 8px;
+        padding: 40px 56px;
+        text-align: center;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.35);
+        color: #0f172a;
+        max-width: 440px;
+      }
+
+      .game-over-title {
+        font-size: clamp(32px, 5vw, 46px);
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #0f172a;
+        margin-bottom: 24px;
+      }
+
+      .dark-btn {
+        background: transparent;
+        border: 2px solid #475569;
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 12px 28px;
+        margin: 6px;
+        min-width: 150px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-transform: uppercase;
+        box-sizing: border-box;
+      }
+
+      .dark-btn:hover {
+        background: #e2e8f0;
+        border-color: #475569;
+        color: #0f172a;
+        transform: translateY(-2px);
+      }
+
+      .dark-btn.outline {
+        background: transparent;
+        color: #0f172a;
+        border: 2px solid #475569;
+      }
+
+      .dark-btn.outline:hover {
+        background: #e2e8f0;
+        border-color: #475569;
+        color: #0f172a;
+      }
+
+      /* Pause Menu Buttons - Strict Uniform Dimensions & Colors matching Resume */
+      .pause-menu-btn {
+        background: rgba(15, 23, 42, 0.85);
+        border: 2px solid #38bdf8;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        padding: 0;
+        margin: 0;
+        width: 220px;
+        height: 48px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.3), inset 0 0 8px rgba(56, 189, 248, 0.2);
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+      }
+
+      .pause-menu-btn:hover {
+        background: #38bdf8;
+        color: #090d16;
+        border-color: #38bdf8;
+        box-shadow: 0 0 22px rgba(56, 189, 248, 0.9), inset 0 0 12px #fff;
+        transform: translateY(-2px);
+      }
+
+      .pause-menu-btn:active {
+        transform: translateY(1px);
+      }
+
+      /* Dedicated Top Bar: Outside Playfield, matching Bottom Queue Bar style */
+      .top-hud-bar {
+        position: relative;
+        width: 100%;
+        height: 48px;
+        flex-shrink: 0;
+        background: #0a0d17;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 16px;
+        z-index: 25;
+        pointer-events: auto;
+      }
+
+      .top-hud-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .hud-icon-btn {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: #ffffff;
+        border-radius: 4px;
+        padding: 0 14px;
+        height: 34px;
+        min-width: 100px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.15s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+      }
+
+      .hud-icon-btn svg {
+        stroke: #ffffff;
+        color: #ffffff;
+        display: block;
+        flex-shrink: 0;
+      }
+
+      .hud-icon-btn:hover {
+        background: #38bdf8;
+        color: #090d16;
+        border-color: #38bdf8;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+      }
+
+      .hud-icon-btn:hover svg {
+        stroke: #090d16;
+        color: #090d16;
+      }
+
+      @media (max-width: 600px) {
+        .top-hud-bar {
+          height: 38px;
+          padding: 0 8px;
+        }
+        .top-bar-branding {
+          font-size: 11px;
+          letter-spacing: 1px;
+        }
+        .top-hud-controls {
+          gap: 4px;
+        }
+        .hud-icon-btn {
+          padding: 0 8px;
+          min-width: auto;
+          font-size: 11px;
+          height: 28px;
+        }
+        .setting-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        .pill-group, .range-slider {
+          width: 100%;
+        }
+        .pill-btn {
+          flex: 1;
+        }
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body data-state="title">
+    <div id="root"></div>
+    <div id="game-wrapper">
+      <div id="game-cabinet">
+        <!-- Dedicated Top Bar (Outside Playfield, matching Bottom Queue Bar style) -->
+        <header id="top-hud-bar" class="top-hud-bar">
+          <div class="top-hud-controls">
+            <button id="btn-sound-toggle" class="hud-icon-btn" title="Toggle Sound">
+              <svg id="sound-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+              <span id="sound-label">Audio</span>
+            </button>
+            <button id="btn-pause-toggle" class="hud-icon-btn" title="Pause Game [Esc / P]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+              <span>Pause</span>
+            </button>
+            <button id="btn-fullscreen-toggle" class="hud-icon-btn" title="Toggle Fullscreen">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+              <span>Fullscreen</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Playfield Area (30x15 Playfield + Bottom Queue Bar) -->
+        <div id="playfield-stage">
+          <canvas id="gameCanvas" width="1200" height="720"></canvas>
+
+      <!-- Main Menu Overlay (Runs over the Live Demo Match) -->
+      <div id="main-menu" class="ui-layer interactive">
+        <div class="title-container">
+          <div class="logo-title">
+            <span>TETRA</span><span style="display: inline-block; width: 18px;"></span><span>PONG</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <button id="btn-play-ai" class="menu-btn" data-start="true">
+            1 Player
+          </button>
+          <button id="btn-play-2p" class="menu-btn">
+            2 Player
+          </button>
+          <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <button id="btn-open-settings" class="menu-btn secondary">⚙ Settings</button>
+            <button id="btn-open-rules" class="menu-btn secondary">📖 How to Play</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 28px; font-size: 13px; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase;">
+          P1: W/S · P2: Up/Down · Touch Drag Supported
+        </div>
+      </div>
+
+      <!-- Settings Modal (Center-Aligned, Symmetrical & Uniform) -->
+      <div id="settings-modal" class="modal-backdrop hidden interactive">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="modal-title">Game Settings</div>
+            <button id="btn-close-settings" class="modal-close">&times;</button>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">AI Difficulty</div>
+            <div class="pill-group" id="ai-difficulty-pills">
+              <button class="pill-btn" data-val="easy">Easy</button>
+              <button class="pill-btn active" data-val="medium">Medium</button>
+              <button class="pill-btn" data-val="hard">Hard</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">Paddle Size</div>
+            <div class="pill-group" id="paddle-size-pills">
+              <button class="pill-btn" data-val="1">Small</button>
+              <button class="pill-btn active" data-val="2">Medium</button>
+              <button class="pill-btn" data-val="3">Large</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">Number of Balls</div>
+            <div class="pill-group" id="ball-count-pills">
+              <button class="pill-btn active" data-val="1">1</button>
+              <button class="pill-btn" data-val="2">2</button>
+              <button class="pill-btn" data-val="3">3</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">SFX Volume</div>
+            <input type="range" id="slider-sfx" class="range-slider" min="0" max="1" step="0.05" value="0.75" />
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">Music Volume</div>
+            <input type="range" id="slider-music" class="range-slider" min="0" max="1" step="0.05" value="0.45" />
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button id="btn-save-settings" class="menu-btn secondary" style="min-width: 120px;">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simplified Rules Modal (3rd-Grade Reading Level) -->
+      <div id="rules-modal" class="modal-backdrop hidden interactive">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="modal-title">How To Play Tetra Pong</div>
+            <button id="btn-close-rules" class="modal-close">&times;</button>
+          </div>
+
+          <div class="rules-content">
+            <div class="rule-item">
+              <span class="rule-bullet">•</span>
+              <span>Bounce the ball past the other player!</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-bullet">•</span>
+              <span>When the ball hits the back wall or a block, a new Tetris block appears.</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-bullet">•</span>
+              <span>Blocks push your paddle closer to the middle line.</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-bullet">•</span>
+              <span>If 3 matching blocks touch each other, they pop and disappear!</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-bullet">•</span>
+              <span>Fill up a whole column of blocks from top to bottom to push the middle line toward the other player!</span>
+            </div>
+            <div class="rule-item">
+              <span class="rule-bullet">•</span>
+              <span>Don't let your paddle touch the middle line, or you lose!</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+            <button id="btn-ok-rules" class="menu-btn secondary" style="min-width: 120px;">Got It</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pause Modal -->
+      <div id="pause-modal" class="modal-backdrop hidden interactive">
+        <div class="modal-card" style="text-align: center; max-width: 380px; padding: 28px 24px;">
+          <div class="modal-title" style="margin-bottom: 20px;">Game Paused</div>
+          <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%;">
+            <button id="btn-resume" class="pause-menu-btn">Resume</button>
+            <button id="btn-restart" class="pause-menu-btn">Restart Match</button>
+            <button id="btn-to-menu" class="pause-menu-btn">Main Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Minimal End Screen (Over pure white screen) -->
+      <div id="game-over-overlay" class="game-over-overlay hidden">
+        <div class="game-over-box">
+          <div id="go-winner-title" class="game-over-title">LEFT WINS!</div>
+          <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="btn-play-again" class="dark-btn outline" data-start="true">Play Again</button>
+            <button id="btn-go-to-menu" class="dark-btn outline">Main Menu</button>
+          </div>
+        </div>
+      </div>
+        </div><!-- /playfield-stage -->
+      </div><!-- /game-cabinet -->
+    </div><!-- /game-wrapper -->
+
+    <!-- Complete Self-Contained Tetra Pong Engine (100% Standalone Vanilla JS) -->
+    <script>
+      /* ============================================================
+         TETRA PONG - PURE CLIENT-SIDE GAME ENGINE
+         Zero External Dependencies - Object Pooled - Web Audio Synth
+         ============================================================ */
+
+      // 1. Grid & Resolution Constants
+      const CANVAS_WIDTH = 1200;
+      const CANVAS_HEIGHT = 720;
+      const PLAYFIELD_WIDTH = 1200;
+      const PLAYFIELD_HEIGHT = 600;
+      const HUD_HEIGHT = 120;
+      const GRID_COLS = 30; // 30 * 40 = 1200px
+      const GRID_ROWS = 15; // 15 * 40 = 600px
+      const CELL_SIZE = 40;
+      const PADDLE_DISTANCE_FROM_BLOCKS = 60; // 1.5 grid columns (60px)
+      const PADDLE_WIDTH = 16;
+      const DEFAULT_BALL_RADIUS = 9;
+
+      // 2. Tetromino Base Shapes & Universal Rotation Function
+      const TETROMINO_KEYS = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+      const TETROMINO_BASE = {
+        I: {
+          color: '#06b6d4',
+          glow: 'rgba(6, 182, 212, 0.7)',
+          width: 4,
+          height: 1,
+          cells: [[0, 0], [0, 1], [0, 2], [0, 3]],
+        },
+        O: {
+          color: '#eab308',
+          glow: 'rgba(234, 179, 8, 0.7)',
+          width: 2,
+          height: 2,
+          cells: [[0, 0], [0, 1], [1, 0], [1, 1]],
+        },
+        T: {
+          color: '#a855f7',
+          glow: 'rgba(168, 85, 247, 0.7)',
+          width: 3,
+          height: 2,
+          cells: [[0, 1], [1, 0], [1, 1], [1, 2]],
+        },
+        S: {
+          color: '#22c55e',
+          glow: 'rgba(34, 197, 94, 0.7)',
+          width: 3,
+          height: 2,
+          cells: [[0, 1], [0, 2], [1, 0], [1, 1]],
+        },
+        Z: {
+          color: '#ef4444',
+          glow: 'rgba(239, 68, 68, 0.7)',
+          width: 3,
+          height: 2,
+          cells: [[0, 0], [0, 1], [1, 1], [1, 2]],
+        },
+        J: {
+          color: '#3b82f6',
+          glow: 'rgba(59, 130, 246, 0.7)',
+          width: 3,
+          height: 2,
+          cells: [[0, 0], [1, 0], [1, 1], [1, 2]],
+        },
+        L: {
+          color: '#f97316',
+          glow: 'rgba(249, 115, 22, 0.7)',
+          width: 3,
+          height: 2,
+          cells: [[0, 2], [1, 0], [1, 1], [1, 2]],
+        },
+      };
+
+      function getRotatedShape(type, rotation) {
+        const base = TETROMINO_BASE[type];
+        const rot = ((rotation % 4) + 4) % 4;
+        if (rot === 0) return base;
+
+        let cells = base.cells.map(([r, c]) => [r, c]);
+        for (let s = 0; s < rot; s++) {
+          cells = cells.map(([r, c]) => [c, -r]);
+        }
+
+        let minR = Infinity, minC = Infinity, maxR = -Infinity, maxC = -Infinity;
+        for (const [r, c] of cells) {
+          if (r < minR) minR = r;
+          if (c < minC) minC = c;
+          if (r > maxR) maxR = r;
+          if (c > maxC) maxC = c;
+        }
+
+        const normalized = cells.map(([r, c]) => [r - minR, c - minC]);
+        normalized.sort((a, b) => a[0] !== b[0] ? a[0] - b[0] : a[1] - b[1]);
+
+        return {
+          type,
+          color: base.color,
+          glow: base.glow,
+          width: maxC - minC + 1,
+          height: maxR - minR + 1,
+          cells: normalized,
+        };
+      }
+
+      // 3. Procedural Web Audio Engine
+      class RetroAudioEngine {
+        constructor() {
+          this.ctx = null;
+          this.masterSFX = 0.75;
+          this.masterMusic = 0.45;
+          this.isMuted = false;
+          this.isPlayingMusic = false;
+          this.musicTimer = null;
+          this.musicStep = 0;
+        }
+
+        init() {
+          if (!this.ctx) {
+            try {
+              const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+              if (AudioContextClass) {
+                this.ctx = new AudioContextClass();
+              }
+            } catch (e) {}
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            try {
+              this.ctx.resume().catch(() => {});
+            } catch (e) {}
+          }
+        }
+
+        playPaddleHit(hitOffsetNorm = 0) {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            const baseFreq = 340 + hitOffsetNorm * 120;
+            osc.frequency.setValueAtTime(baseFreq, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.08);
+
+            const vol = Math.max(0.0001, 0.2 * this.masterSFX);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.1);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.1);
+          } catch (e) {}
+        }
+
+        playWallHit() {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.exponentialRampToValueAtTime(110, now + 0.07);
+
+            const vol = Math.max(0.0001, 0.18 * this.masterSFX);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.08);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+          } catch (e) {}
+        }
+
+        playBlockLockIn() {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(140, now);
+            osc.frequency.exponentialRampToValueAtTime(45, now + 0.16);
+
+            const vol = Math.max(0.0001, 0.3 * this.masterSFX);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.18);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.18);
+          } catch (e) {}
+        }
+
+        playBlockPop() {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(360, now);
+            osc.frequency.exponentialRampToValueAtTime(920, now + 0.09);
+
+            const vol = Math.max(0.0001, 0.35 * this.masterSFX);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.12);
+
+            const osc2 = this.ctx.createOscillator();
+            const gain2 = this.ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(1100, now + 0.02);
+            osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.08);
+            gain2.gain.setValueAtTime(0.12 * this.masterSFX, now + 0.02);
+            gain2.gain.linearRampToValueAtTime(0, now + 0.08);
+
+            osc2.connect(gain2);
+            gain2.connect(this.ctx.destination);
+            osc2.start(now + 0.02);
+            osc2.stop(now + 0.08);
+          } catch (e) {}
+        }
+
+        playFanfare() {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const notes = [392.00, 523.25, 659.25, 783.99, 1046.50]; // G4, C5, E5, G5, C6
+            notes.forEach((freq, idx) => {
+              const noteTime = now + idx * 0.07;
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, noteTime);
+
+              const vol = Math.max(0.0001, 0.22 * this.masterSFX);
+              gain.gain.setValueAtTime(vol, noteTime);
+              gain.gain.linearRampToValueAtTime(0, noteTime + 0.22);
+
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+              osc.start(noteTime);
+              osc.stop(noteTime + 0.22);
+            });
+          } catch (e) {}
+        }
+
+        /**
+         * Procedural Sword Slash Sound Effect:
+         * Filtered white noise burst + rapid high-to-low frequency sweep
+         */
+        playSwordSlash() {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const sampleRate = (this.ctx && this.ctx.sampleRate) ? this.ctx.sampleRate : 44100;
+            const bufferSize = Math.max(128, Math.floor(sampleRate * 0.22));
+            const noiseBuffer = this.ctx.createBuffer(1, bufferSize, sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              output[i] = Math.random() * 2 - 1;
+            }
+            const noiseSource = this.ctx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+
+            const bandpass = this.ctx.createBiquadFilter();
+            bandpass.type = 'bandpass';
+            bandpass.Q.value = 3.5;
+            bandpass.frequency.setValueAtTime(3400, now);
+            bandpass.frequency.exponentialRampToValueAtTime(320, now + 0.2);
+
+            const noiseGain = this.ctx.createGain();
+            const nVol = Math.max(0.0001, 0.6 * this.masterSFX);
+            noiseGain.gain.setValueAtTime(nVol, now);
+            noiseGain.gain.linearRampToValueAtTime(0, now + 0.2);
+
+            noiseSource.connect(bandpass);
+            bandpass.connect(noiseGain);
+            noiseGain.connect(this.ctx.destination);
+            noiseSource.start(now);
+            noiseSource.stop(now + 0.22);
+
+            const osc = this.ctx.createOscillator();
+            const toneGain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(1900, now);
+            osc.frequency.exponentialRampToValueAtTime(140, now + 0.18);
+
+            const tVol = Math.max(0.0001, 0.35 * this.masterSFX);
+            toneGain.gain.setValueAtTime(tVol, now);
+            toneGain.gain.linearRampToValueAtTime(0, now + 0.18);
+
+            osc.connect(toneGain);
+            toneGain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.2);
+          } catch (e) {}
+        }
+
+        playZoomSweep() {
+          if (!this.ctx || this.isMuted || this.masterSFX <= 0) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(80, now);
+            osc.frequency.exponentialRampToValueAtTime(1400, now + 2.0);
+
+            gain.gain.setValueAtTime(0.05 * this.masterSFX, now);
+            gain.gain.linearRampToValueAtTime(0.35 * this.masterSFX, now + 1.8);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 2.2);
+          } catch (e) {}
+        }
+
+        startBGM() {
+          if (this.isPlayingMusic) return;
+          this.isPlayingMusic = true;
+          this.scheduleNextNote();
+        }
+
+        stopBGM() {
+          this.isPlayingMusic = false;
+          if (this.musicTimer) {
+            clearTimeout(this.musicTimer);
+            this.musicTimer = null;
+          }
+        }
+
+        scheduleNextNote() {
+          if (!this.isPlayingMusic) return;
+          if (this.ctx && !this.isMuted && this.masterMusic > 0) {
+            try {
+              const now = this.ctx.currentTime;
+              const step = this.musicStep % 16;
+              const bassNotes = [65.41, 65.41, 73.42, 65.41, 87.31, 87.31, 98.00, 87.31];
+              if (step % 2 === 0) {
+                const bOsc = this.ctx.createOscillator();
+                const bGain = this.ctx.createGain();
+                bOsc.type = 'sawtooth';
+                bOsc.frequency.setValueAtTime(bassNotes[(step / 2) % bassNotes.length], now);
+                const bVol = Math.max(0.0001, 0.08 * this.masterMusic);
+                bGain.gain.setValueAtTime(bVol, now);
+                bGain.gain.linearRampToValueAtTime(0, now + 0.16);
+                bOsc.connect(bGain);
+                bGain.connect(this.ctx.destination);
+                bOsc.start(now);
+                bOsc.stop(now + 0.16);
+              }
+
+              const arpPitches = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23];
+              if (step % 2 === 1) {
+                const aOsc = this.ctx.createOscillator();
+                const aGain = this.ctx.createGain();
+                aOsc.type = 'sine';
+                aOsc.frequency.setValueAtTime(arpPitches[step % arpPitches.length], now);
+                const aVol = Math.max(0.0001, 0.06 * this.masterMusic);
+                aGain.gain.setValueAtTime(aVol, now);
+                aGain.gain.linearRampToValueAtTime(0, now + 0.14);
+                aOsc.connect(aGain);
+                aGain.connect(this.ctx.destination);
+                aOsc.start(now);
+                aOsc.stop(now + 0.14);
+              }
+            } catch (e) {}
+          }
+          this.musicStep++;
+          this.musicTimer = setTimeout(() => this.scheduleNextNote(), 115);
+        }
+      }
+
+      // 4. Object Pools
+      const MAX_PARTICLES = 256;
+      class ParticlePool {
+        constructor() {
+          this.particles = new Array(MAX_PARTICLES);
+          for (let i = 0; i < MAX_PARTICLES; i++) {
+            this.particles[i] = {
+              active: false,
+              x: 0,
+              y: 0,
+              vx: 0,
+              vy: 0,
+              life: 0,
+              maxLife: 1,
+              size: 2,
+              color: '#ffffff',
+            };
+          }
+        }
+
+        spawn(x, y, count, color = '#38bdf8', speed = 120, size = 3) {
+          let spawned = 0;
+          for (let i = 0; i < MAX_PARTICLES && spawned < count; i++) {
+            const p = this.particles[i];
+            if (!p.active) {
+              p.active = true;
+              p.x = x;
+              p.y = y;
+              const angle = Math.random() * Math.PI * 2;
+              const spd = (0.3 + Math.random() * 0.7) * speed;
+              p.vx = Math.cos(angle) * spd;
+              p.vy = Math.sin(angle) * spd;
+              p.life = 0;
+              p.maxLife = 0.3 + Math.random() * 0.4;
+              p.size = size * (0.6 + Math.random() * 0.8);
+              p.color = color;
+              spawned++;
+            }
+          }
+        }
+
+        update(dt) {
+          for (let i = 0; i < MAX_PARTICLES; i++) {
+            const p = this.particles[i];
+            if (p.active) {
+              p.life += dt;
+              if (p.life >= p.maxLife) {
+                p.active = false;
+              } else {
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.vx *= 0.95;
+                p.vy *= 0.95;
+              }
+            }
+          }
+        }
+
+        draw(ctx) {
+          for (let i = 0; i < MAX_PARTICLES; i++) {
+            const p = this.particles[i];
+            if (p.active) {
+              const alpha = Math.max(0, 1 - p.life / p.maxLife);
+              ctx.save();
+              ctx.globalAlpha = alpha;
+              ctx.fillStyle = p.color;
+              ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+              ctx.restore();
+            }
+          }
+        }
+
+        reset() {
+          for (let i = 0; i < MAX_PARTICLES; i++) {
+            this.particles[i].active = false;
+          }
+        }
+      }
+
+      // 5. Game State Class
+      class TetraPongGame {
+        constructor() {
+          this.canvas = document.getElementById('gameCanvas');
+          this.ctx = this.canvas.getContext('2d', { alpha: false });
+          this.audio = new RetroAudioEngine();
+          this.particlePool = new ParticlePool();
+
+          this.state = 'menu_demo';
+          this.isDemo = true;
+          this.gameMode = '1p'; // '1p' or '2p'
+
+          // Configuration
+          this.aiDifficulty = 'medium'; // 'easy' | 'medium' | 'hard'
+          this.paddleSizeSetting = 2; // 1 (80px), 2 (120px), 3 (160px)
+          this.ballCountSetting = 1; // 1, 2, 3
+          this.paddleHeight = 120;
+
+          // AI Tracking, Reaction Delay & Inaccuracy State
+          this.aiReactionTimer = 0;
+          this.aiErrorOffset = 0;
+          this.aiLastBallRef = null;
+
+          // Board & Grid
+          this.grid = [];
+          for (let r = 0; r < GRID_ROWS; r++) {
+            const row = [];
+            for (let c = 0; c < GRID_COLS; c++) {
+              row.push({
+                solid: false,
+                color: '#38bdf8',
+                spawnAge: 1, // for scale/fade-in animation
+                maxSpawnAge: 0.12,
+              });
+            }
+            this.grid.push(row);
+          }
+          this.columnClaimed = new Array(GRID_COLS).fill(false);
+          this.medianCol = 15;
+          this.medianX = 15 * CELL_SIZE; // 600px
+
+          // Paddles
+          this.paddle1 = {
+            x: 60,
+            y: 240,
+            targetX: 60,
+            vy: 0,
+            width: PADDLE_WIDTH,
+            height: 120,
+            color: '#ffffff',
+          };
+          this.paddle2 = {
+            x: 1200 - 60 - PADDLE_WIDTH,
+            y: 240,
+            targetX: 1200 - 60 - PADDLE_WIDTH,
+            vy: 0,
+            width: PADDLE_WIDTH,
+            height: 120,
+            color: '#ffffff',
+          };
+
+          // Balls pool (max 3)
+          this.balls = [
+            { active: true, x: 600, y: 300, vx: 500, vy: 240, radius: DEFAULT_BALL_RADIUS, canSpawn: true },
+            { active: false, x: 600, y: 300, vx: -500, vy: -200, radius: DEFAULT_BALL_RADIUS, canSpawn: true },
+            { active: false, x: 600, y: 300, vx: 450, vy: 300, radius: DEFAULT_BALL_RADIUS, canSpawn: true },
+          ];
+
+          // 9-Block Queue: each item has shape type AND rotation (0: 0°, 1: 90°, 2: 180°, 3: 270°)
+          this.queue = [];
+          for (let i = 0; i < 9; i++) {
+            this.queue.push({
+              type: this.randomTetromino(),
+              rotation: Math.floor(Math.random() * 4),
+            });
+          }
+
+          // Pending block spawns (max 10)
+          this.pendingSpawns = [];
+          this.nextPieceId = 1;
+
+          // Match Info
+          this.winner = null;
+          this.losingSide = null; // 'p1' | 'p2'
+
+          // Freeze & Zoom sequence timers
+          this.freezeTimer = 0;
+          this.zoomTimer = 0;
+          this.zoomDuration = 2.2;
+          this.zoomTarget = { x: 600, y: 300 };
+
+          // Input handling
+          this.keys = {};
+          this.touches = { leftY: null, rightY: null };
+
+          // Screen Shake
+          this.screenShake = 0;
+
+          this.setupEvents();
+          this.setupUI();
+          this.resetToDemo();
+
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('autostart') === '1') {
+            this.startGame('1p');
+          }
+        }
+
+        randomTetromino() {
+          const idx = Math.floor(Math.random() * TETROMINO_KEYS.length);
+          return TETROMINO_KEYS[idx];
+        }
+
+        setupEvents() {
+          window.addEventListener('keydown', (e) => {
+            try {
+              if (e.key) {
+                this.keys[e.key.toLowerCase()] = true;
+              }
+              if (e.code) {
+                this.keys[e.code] = true;
+              }
+              this.audio.init();
+
+              if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+                if (this.state === 'playing') {
+                  this.pauseGame();
+                } else if (this.state === 'paused') {
+                  this.resumeGame();
+                }
+              }
+            } catch (err) {}
+          });
+
+          window.addEventListener('keyup', (e) => {
+            try {
+              if (e.key) {
+                this.keys[e.key.toLowerCase()] = false;
+              }
+              if (e.code) {
+                this.keys[e.code] = false;
+              }
+            } catch (err) {}
+          });
+
+          // Touch Drag Support
+          const canvas = this.canvas;
+          const handleTouch = (e) => {
+            try {
+              this.audio.init();
+              const rect = canvas.getBoundingClientRect();
+              const scaleX = rect.width > 0 ? CANVAS_WIDTH / rect.width : 1;
+              const scaleY = rect.height > 0 ? CANVAS_HEIGHT / rect.height : 1;
+
+              for (let i = 0; i < e.touches.length; i++) {
+                const t = e.touches[i];
+                const canvasX = (t.clientX - rect.left) * scaleX;
+                const canvasY = (t.clientY - rect.top) * scaleY;
+
+                if (canvasX < CANVAS_WIDTH / 2) {
+                  this.touches.leftY = canvasY;
+                } else {
+                  this.touches.rightY = canvasY;
+                }
+              }
+            } catch (err) {}
+          };
+
+          canvas.addEventListener('touchstart', (e) => {
+            handleTouch(e);
+            if (e.cancelable) e.preventDefault();
+          }, { passive: false });
+
+          canvas.addEventListener('touchmove', (e) => {
+            handleTouch(e);
+            if (e.cancelable) e.preventDefault();
+          }, { passive: false });
+
+          const endTouch = () => {
+            this.touches.leftY = null;
+            this.touches.rightY = null;
+          };
+          canvas.addEventListener('touchend', endTouch);
+          canvas.addEventListener('touchcancel', endTouch);
+
+          window.addEventListener('blur', () => {
+            this.keys = {};
+            this.touches.leftY = null;
+            this.touches.rightY = null;
+          });
+        }
+
+        setupUI() {
+          document.getElementById('btn-play-ai')?.addEventListener('click', () => {
+            this.audio.init();
+            this.audio.startBGM();
+            this.startGame('1p');
+          });
+
+          document.getElementById('btn-play-2p')?.addEventListener('click', () => {
+            this.audio.init();
+            this.audio.startBGM();
+            this.startGame('2p');
+          });
+
+          document.getElementById('btn-open-settings')?.addEventListener('click', () => {
+            document.getElementById('settings-modal')?.classList.remove('hidden');
+          });
+          document.getElementById('btn-close-settings')?.addEventListener('click', () => {
+            document.getElementById('settings-modal')?.classList.add('hidden');
+          });
+          document.getElementById('btn-save-settings')?.addEventListener('click', () => {
+            document.getElementById('settings-modal')?.classList.add('hidden');
+          });
+
+          document.getElementById('btn-open-rules')?.addEventListener('click', () => {
+            document.getElementById('rules-modal')?.classList.remove('hidden');
+          });
+          document.getElementById('btn-close-rules')?.addEventListener('click', () => {
+            document.getElementById('rules-modal')?.classList.add('hidden');
+          });
+          document.getElementById('btn-ok-rules')?.addEventListener('click', () => {
+            document.getElementById('rules-modal')?.classList.add('hidden');
+          });
+
+          document.getElementById('btn-resume')?.addEventListener('click', () => this.resumeGame());
+          document.getElementById('btn-restart')?.addEventListener('click', () => {
+            document.getElementById('pause-modal')?.classList.add('hidden');
+            this.startGame(this.gameMode);
+          });
+          document.getElementById('btn-to-menu')?.addEventListener('click', () => {
+            document.getElementById('pause-modal')?.classList.add('hidden');
+            this.resetToDemo();
+          });
+
+          document.getElementById('btn-pause-toggle')?.addEventListener('click', () => {
+            if (this.state === 'playing') this.pauseGame();
+            else if (this.state === 'paused') this.resumeGame();
+          });
+
+          document.getElementById('btn-sound-toggle')?.addEventListener('click', () => {
+            this.audio.init();
+            this.audio.isMuted = !this.audio.isMuted;
+            const label = document.getElementById('sound-label');
+            const svg = document.getElementById('sound-svg');
+            if (label) label.textContent = this.audio.isMuted ? 'Muted' : 'Audio';
+            if (svg) {
+              if (this.audio.isMuted) {
+                svg.innerHTML = `
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <line x1="23" y1="9" x2="17" y2="15"></line>
+                  <line x1="17" y1="9" x2="23" y2="15"></line>
+                `;
+              } else {
+                svg.innerHTML = `
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                `;
+              }
+            }
+          });
+
+          document.getElementById('btn-fullscreen-toggle')?.addEventListener('click', () => {
+            try {
+              if (!document.fullscreenElement) {
+                const req = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+                if (req) {
+                  req.call(document.documentElement).catch(() => {});
+                }
+              } else {
+                const exit = document.exitFullscreen || document.webkitExitFullscreen;
+                if (exit) {
+                  exit.call(document).catch(() => {});
+                }
+              }
+            } catch (err) {}
+          });
+
+          document.getElementById('btn-play-again')?.addEventListener('click', () => {
+            document.getElementById('game-over-overlay')?.classList.add('hidden');
+            this.startGame(this.gameMode);
+          });
+
+          document.getElementById('btn-go-to-menu')?.addEventListener('click', () => {
+            document.getElementById('game-over-overlay')?.classList.add('hidden');
+            this.resetToDemo();
+          });
+
+          const setupPillGroup = (containerId, onSelect) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const pills = container.querySelectorAll('.pill-btn');
+            pills.forEach((p) => {
+              p.addEventListener('click', () => {
+                pills.forEach((btn) => btn.classList.remove('active'));
+                p.classList.add('active');
+                onSelect(p.getAttribute('data-val'));
+              });
+            });
+          };
+
+          setupPillGroup('ai-difficulty-pills', (val) => {
+            this.aiDifficulty = val;
+          });
+
+          setupPillGroup('paddle-size-pills', (val) => {
+            this.paddleSizeSetting = parseInt(val, 10);
+            this.updatePaddleDimensions();
+            this.paddle1.y = Math.max(0, Math.min(PLAYFIELD_HEIGHT - this.paddle1.height, this.paddle1.y));
+            this.paddle2.y = Math.max(0, Math.min(PLAYFIELD_HEIGHT - this.paddle2.height, this.paddle2.y));
+          });
+
+          setupPillGroup('ball-count-pills', (val) => {
+            this.ballCountSetting = parseInt(val, 10);
+            this.updateLiveBallCount(this.ballCountSetting);
+          });
+
+          const sfxSlider = document.getElementById('slider-sfx');
+          sfxSlider?.addEventListener('input', (e) => {
+            this.audio.masterSFX = parseFloat(e.target.value);
+          });
+
+          const musicSlider = document.getElementById('slider-music');
+          musicSlider?.addEventListener('input', (e) => {
+            this.audio.masterMusic = parseFloat(e.target.value);
+          });
+        }
+
+        updatePaddleDimensions() {
+          const heights = { 1: 80, 2: 120, 3: 160 };
+          this.paddleHeight = heights[this.paddleSizeSetting] || 120;
+          this.paddle1.height = this.paddleHeight;
+          this.paddle2.height = this.paddleHeight;
+        }
+
+        updateLiveBallCount(count) {
+          const speedMultiplier = this.isDemo ? 1.4 : 1.0;
+          const baseSpeed = 520 * speedMultiplier;
+
+          // Ball 0 is always active
+          this.balls[0].active = count >= 1;
+
+          // Ball 1
+          if (count >= 2) {
+            if (!this.balls[1].active) {
+              this.balls[1].active = true;
+              this.balls[1].x = 600;
+              this.balls[1].y = 220;
+              this.balls[1].vx = baseSpeed * 0.95 * (Math.random() > 0.5 ? 1 : -1);
+              this.balls[1].vy = -190;
+              this.balls[1].radius = DEFAULT_BALL_RADIUS;
+              this.balls[1].canSpawn = true;
+              this.particlePool.spawn(600, 220, 8, '#38bdf8', 120);
+            }
+          } else {
+            this.balls[1].active = false;
+          }
+
+          // Ball 2
+          if (count >= 3) {
+            if (!this.balls[2].active) {
+              this.balls[2].active = true;
+              this.balls[2].x = 600;
+              this.balls[2].y = 380;
+              this.balls[2].vx = -baseSpeed * 1.05 * (Math.random() > 0.5 ? 1 : -1);
+              this.balls[2].vy = 230;
+              this.balls[2].radius = DEFAULT_BALL_RADIUS;
+              this.balls[2].canSpawn = true;
+              this.particlePool.spawn(600, 380, 8, '#38bdf8', 120);
+            }
+          } else {
+            this.balls[2].active = false;
+          }
+        }
+
+        resetPlayfield() {
+          this.nextPieceId = 1;
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+              this.grid[r][c].solid = false;
+              this.grid[r][c].pieceId = undefined;
+              this.grid[r][c].shapeType = undefined;
+              this.grid[r][c].color = undefined;
+              this.grid[r][c].spawnAge = 1;
+            }
+          }
+          this.columnClaimed.fill(false);
+          this.medianCol = 15;
+          this.medianX = 15 * CELL_SIZE;
+
+          this.updatePaddleDimensions();
+          this.paddle1.y = (PLAYFIELD_HEIGHT - this.paddleHeight) / 2;
+          this.paddle2.y = (PLAYFIELD_HEIGHT - this.paddleHeight) / 2;
+          this.paddle1.targetX = 60;
+          this.paddle1.x = 60;
+          this.paddle2.targetX = PLAYFIELD_WIDTH - 60 - PADDLE_WIDTH;
+          this.paddle2.x = PLAYFIELD_WIDTH - 60 - PADDLE_WIDTH;
+
+          // Re-randomize both shape AND rotation for all 9 queue blocks
+          this.queue = [];
+          for (let i = 0; i < 9; i++) {
+            this.queue.push({
+              type: this.randomTetromino(),
+              rotation: Math.floor(Math.random() * 4),
+            });
+          }
+
+          const speedMultiplier = this.isDemo ? 1.4 : 1.0;
+          const baseSpeed = 520 * speedMultiplier;
+          this.balls = [
+            { active: true, x: 600, y: 300, vx: -baseSpeed, vy: 160, radius: DEFAULT_BALL_RADIUS, canSpawn: true },
+            { active: this.ballCountSetting >= 2, x: 600, y: 220, vx: baseSpeed * 0.95, vy: -190, radius: DEFAULT_BALL_RADIUS, canSpawn: true },
+            { active: this.ballCountSetting >= 3, x: 600, y: 380, vx: -baseSpeed * 1.05, vy: 230, radius: DEFAULT_BALL_RADIUS, canSpawn: true },
+          ];
+
+          this.pendingSpawns = [];
+          this.particlePool.reset();
+          this.winner = null;
+          this.losingSide = null;
+          this.freezeTimer = 0;
+          this.zoomTimer = 0;
+          this.aiReactionTimer = 0;
+          this.aiErrorOffset = 0;
+          this.aiLastBallRef = null;
+        }
+
+        resetToDemo() {
+          this.isDemo = true;
+          this.state = 'menu_demo';
+          document.body.dataset.state = 'title';
+          document.getElementById('top-hud-bar')?.classList.remove('hidden');
+          document.getElementById('main-menu')?.classList.remove('hidden');
+          document.getElementById('pause-modal')?.classList.add('hidden');
+          document.getElementById('game-over-overlay')?.classList.add('hidden');
+          this.resetPlayfield();
+        }
+
+        startGame(mode = '1p') {
+          this.isDemo = false;
+          this.gameMode = mode;
+          this.state = 'playing';
+          document.body.dataset.state = 'playing';
+          document.getElementById('top-hud-bar')?.classList.remove('hidden');
+          document.getElementById('main-menu')?.classList.add('hidden');
+          document.getElementById('pause-modal')?.classList.add('hidden');
+          document.getElementById('game-over-overlay')?.classList.add('hidden');
+          this.resetPlayfield();
+        }
+
+        pauseGame() {
+          if (this.state !== 'playing') return;
+          this.state = 'paused';
+          document.body.dataset.state = 'paused';
+          document.getElementById('pause-modal')?.classList.remove('hidden');
+        }
+
+        resumeGame() {
+          if (this.state !== 'paused') return;
+          this.state = 'playing';
+          document.body.dataset.state = 'playing';
+          document.getElementById('pause-modal')?.classList.add('hidden');
+        }
+
+        triggerDefeat(losingSide) {
+          this.losingSide = losingSide;
+          this.winner = losingSide === 'p1' ? 'Right' : 'Left';
+          this.state = 'freeze_alarm';
+          this.freezeTimer = 2.5; // 2.5-second post-loss freeze
+          this.zoomTimer = 0;
+          this.zoomDuration = 2.2;
+          const losingPaddle = losingSide === 'p1' ? this.paddle1 : this.paddle2;
+          this.zoomTarget = {
+            x: losingPaddle.x + losingPaddle.width / 2,
+            y: losingPaddle.y + losingPaddle.height / 2,
+          };
+
+          // Play single sharp sword slash SFX
+          this.audio.playSwordSlash();
+          // Stop BGM for complete silence during the 2.5-second freeze
+          this.audio.stopBGM();
+        }
+
+        // --- Core Simulation Tick ---
+        update(dt) {
+          const safeDt = Math.min(dt, 0.05);
+
+          this.particlePool.update(safeDt);
+
+          if (this.screenShake > 0) {
+            this.screenShake = Math.max(0, this.screenShake - safeDt * 18);
+          }
+
+          // Advance spawn scale/fade-in animation for newly materialized blocks
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+              if (this.grid[r][c].solid && this.grid[r][c].spawnAge < this.grid[r][c].maxSpawnAge) {
+                this.grid[r][c].spawnAge += safeDt;
+              }
+            }
+          }
+
+          // 2.5-Second Silent Freeze Sequence (No Visible Timer / Countdown)
+          if (this.state === 'freeze_alarm') {
+            this.freezeTimer -= safeDt;
+            if (this.freezeTimer <= 0) {
+              this.state = 'zoom_defeat';
+              this.zoomTimer = 0;
+              this.zoomDuration = 2.2;
+              this.audio.playZoomSweep();
+              const losingPaddle = this.losingSide === 'p1' ? this.paddle1 : this.paddle2;
+              this.zoomTarget = {
+                x: losingPaddle.x + losingPaddle.width / 2,
+                y: losingPaddle.y + losingPaddle.height / 2,
+              };
+            }
+            return;
+          }
+
+          if (this.state === 'zoom_defeat') {
+            this.zoomTimer += safeDt;
+            if (this.zoomTimer >= this.zoomDuration) {
+              if (this.isDemo) {
+                this.resetToDemo();
+              } else {
+                this.state = 'game_over';
+                document.body.dataset.state = 'gameover';
+                this.showGameOverModal();
+              }
+            }
+            return;
+          }
+
+          if (this.state === 'paused' || this.state === 'game_over') {
+            return;
+          }
+
+          // 1. Update Paddles (with live AI difficulty in both Demo and 1P mode)
+          this.updatePaddles(safeDt);
+
+          // 2. Update Balls & Deflections
+          this.updateBalls(safeDt);
+
+          // 3. Update Sliding Blocks (Smooth Fall-Back animation & Anti-Stuck ball physics)
+          this.updateSlidingBlocks(safeDt);
+
+          // 4. Update Pending Spawns (Safe Distance Check & Anti-Collision Delay)
+          this.updatePendingSpawns(safeDt);
+
+          // 5. Update Dynamic Horizontal Paddle Push (Smooth 150-200ms lerp)
+          this.updatePaddleHorizontalPositions(safeDt);
+
+          // 6. Check Median Line Breach (Defeat Check)
+          this.checkDefeatConditions();
+        }
+
+        updatePaddles(dt) {
+          const aiSpeeds = { easy: 240, medium: 320, hard: 410, hyper: 580 };
+          const currentAiSpeed = aiSpeeds[this.aiDifficulty] || 320;
+
+          // Player 1 Control (Left)
+          let p1Dir = 0;
+          if (this.isDemo) {
+            p1Dir = this.getAIDirection(this.paddle1, 'left', this.aiDifficulty, dt);
+            this.paddle1.y += p1Dir * currentAiSpeed * dt;
+          } else {
+            if (this.touches.leftY !== null) {
+              const pCenter = this.paddle1.y + this.paddle1.height / 2;
+              if (Math.abs(this.touches.leftY - pCenter) > 10) {
+                p1Dir = this.touches.leftY < pCenter ? -1 : 1;
+              }
+            } else {
+              if (this.keys['w'] || this.keys['keyw']) p1Dir -= 1;
+              if (this.keys['s'] || this.keys['keys']) p1Dir += 1;
+            }
+            this.paddle1.y += p1Dir * 580 * dt;
+          }
+          this.paddle1.y = Math.max(0, Math.min(PLAYFIELD_HEIGHT - this.paddle1.height, this.paddle1.y));
+
+          // Player 2 Control (Right)
+          let p2Dir = 0;
+          if (this.isDemo) {
+            p2Dir = this.getAIDirection(this.paddle2, 'right', this.aiDifficulty, dt);
+            this.paddle2.y += p2Dir * currentAiSpeed * dt;
+          } else if (this.gameMode === '1p') {
+            p2Dir = this.getAIDirection(this.paddle2, 'right', this.aiDifficulty, dt);
+            this.paddle2.y += p2Dir * currentAiSpeed * dt;
+          } else {
+            // 2P Local human control
+            if (this.touches.rightY !== null) {
+              const pCenter = this.paddle2.y + this.paddle2.height / 2;
+              if (Math.abs(this.touches.rightY - pCenter) > 10) {
+                p2Dir = this.touches.rightY < pCenter ? -1 : 1;
+              }
+            } else {
+              if (this.keys['arrowup']) p2Dir -= 1;
+              if (this.keys['arrowdown']) p2Dir += 1;
+            }
+            this.paddle2.y += p2Dir * 580 * dt;
+          }
+          this.paddle2.y = Math.max(0, Math.min(PLAYFIELD_HEIGHT - this.paddle2.height, this.paddle2.y));
+        }
+
+        getAIDirection(paddle, side, difficulty, dt = 0.016) {
+          let targetBall = null;
+          let minDistance = Infinity;
+
+          for (const b of this.balls) {
+            if (!b.active) continue;
+            const headingToMe = side === 'left' ? b.vx < 0 : b.vx > 0;
+            const dist = Math.abs(b.x - paddle.x);
+            if (headingToMe && dist < minDistance) {
+              minDistance = dist;
+              targetBall = b;
+            }
+          }
+
+          if (!targetBall) {
+            const centerDiff = (PLAYFIELD_HEIGHT - paddle.height) / 2 - paddle.y;
+            return Math.abs(centerDiff) > 15 ? (centerDiff > 0 ? 0.35 : -0.35) : 0;
+          }
+
+          // If playing in 1P mode, apply reaction delay and human-like positional inaccuracy
+          if (difficulty !== 'hyper') {
+            if (this.aiLastBallRef !== targetBall) {
+              this.aiLastBallRef = targetBall;
+              // Reaction delay
+              this.aiReactionTimer = difficulty === 'easy' ? 0.32 : difficulty === 'medium' ? 0.18 : 0.08;
+              // Random inaccuracy offset (occasionally misses fast-angled shots)
+              const maxErr = difficulty === 'easy' ? 65 : difficulty === 'medium' ? 38 : 20;
+              this.aiErrorOffset = (Math.random() - 0.5) * maxErr;
+            }
+
+            if (this.aiReactionTimer > 0) {
+              this.aiReactionTimer -= dt;
+              return 0; // AI pauses slightly before tracking newly deflected ball
+            }
+          }
+
+          let predictedY = targetBall.y + (difficulty !== 'hyper' ? this.aiErrorOffset : 0);
+
+          if (difficulty === 'hard' || difficulty === 'hyper') {
+            const timeToReach = Math.abs((paddle.x - targetBall.x) / targetBall.vx);
+            predictedY = (targetBall.y + (difficulty !== 'hyper' ? this.aiErrorOffset : 0)) + targetBall.vy * Math.min(timeToReach, 1.2);
+            while (predictedY < 0 || predictedY > PLAYFIELD_HEIGHT) {
+              if (predictedY < 0) predictedY = -predictedY;
+              if (predictedY > PLAYFIELD_HEIGHT) predictedY = 2 * PLAYFIELD_HEIGHT - predictedY;
+            }
+          } else if (difficulty === 'medium') {
+            const timeToReach = Math.abs((paddle.x - targetBall.x) / targetBall.vx);
+            predictedY = (targetBall.y + this.aiErrorOffset) + targetBall.vy * Math.min(timeToReach * 0.6, 0.6);
+            if (predictedY < 0) predictedY = 0;
+            if (predictedY > PLAYFIELD_HEIGHT) predictedY = PLAYFIELD_HEIGHT;
+          }
+
+          const paddleCenter = paddle.y + paddle.height / 2;
+          const deadZone = difficulty === 'hyper' ? 6 : difficulty === 'hard' ? 14 : 26;
+          const delta = predictedY - paddleCenter;
+
+          if (Math.abs(delta) > deadZone) {
+            return delta > 0 ? 1 : -1;
+          }
+          return 0;
+        }
+
+        updateBalls(dt) {
+          const speedMultiplier = this.isDemo ? 1.4 : 1.0;
+
+          for (let bIdx = 0; bIdx < this.balls.length; bIdx++) {
+            const b = this.balls[bIdx];
+            if (!b.active) continue;
+
+            const prevX = b.x;
+
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+
+            if (Math.random() < 0.3) {
+              this.particlePool.spawn(b.x, b.y, 1, '#38bdf8', 30, 2);
+            }
+
+            // Top and Bottom Wall Bounces
+            if (b.y - b.radius <= 0) {
+              b.y = b.radius;
+              b.vy = Math.abs(b.vy);
+              this.audio.playWallHit();
+              this.particlePool.spawn(b.x, b.y, 4, '#e2e8f0', 70);
+            } else if (b.y + b.radius >= PLAYFIELD_HEIGHT) {
+              b.y = PLAYFIELD_HEIGHT - b.radius;
+              b.vy = -Math.abs(b.vy);
+              this.audio.playWallHit();
+              this.particlePool.spawn(b.x, b.y, 4, '#e2e8f0', 70);
+            }
+
+            // Median Line Crossing Turn Reset
+            if ((prevX < this.medianX && b.x >= this.medianX) || (prevX > this.medianX && b.x <= this.medianX)) {
+              b.canSpawn = true;
+            }
+
+            // Paddle Collisions
+            // Left Paddle
+            if (
+              b.vx < 0 &&
+              b.x - b.radius <= this.paddle1.x + this.paddle1.width &&
+              b.x + b.radius >= this.paddle1.x &&
+              b.y >= this.paddle1.y - b.radius &&
+              b.y <= this.paddle1.y + this.paddle1.height + b.radius
+            ) {
+              b.x = this.paddle1.x + this.paddle1.width + b.radius;
+              const hitOffset = (b.y - (this.paddle1.y + this.paddle1.height / 2)) / (this.paddle1.height / 2);
+              const maxAngle = Math.PI / 3;
+              const speed = Math.min(950 * speedMultiplier, Math.hypot(b.vx, b.vy) * 1.03);
+              const angle = hitOffset * maxAngle;
+              b.vx = Math.cos(angle) * speed;
+              b.vy = Math.sin(angle) * speed;
+              b.canSpawn = true;
+              this.audio.playPaddleHit(hitOffset);
+              this.screenShake = 3;
+              this.particlePool.spawn(b.x, b.y, 8, '#ffffff', 140);
+            }
+
+            // Right Paddle
+            if (
+              b.vx > 0 &&
+              b.x + b.radius >= this.paddle2.x &&
+              b.x - b.radius <= this.paddle2.x + this.paddle2.width &&
+              b.y >= this.paddle2.y - b.radius &&
+              b.y <= this.paddle2.y + this.paddle2.height + b.radius
+            ) {
+              b.x = this.paddle2.x - b.radius;
+              const hitOffset = (b.y - (this.paddle2.y + this.paddle2.height / 2)) / (this.paddle2.height / 2);
+              const maxAngle = Math.PI / 3;
+              const speed = Math.min(950 * speedMultiplier, Math.hypot(b.vx, b.vy) * 1.03);
+              const angle = hitOffset * maxAngle;
+              b.vx = -Math.cos(angle) * speed;
+              b.vy = Math.sin(angle) * speed;
+              b.canSpawn = true;
+              this.audio.playPaddleHit(hitOffset);
+              this.screenShake = 3;
+              this.particlePool.spawn(b.x, b.y, 8, '#ffffff', 140);
+            }
+
+            // Back Walls & Grid Block Collisions with Overlap Ejection Safety Net
+            this.handleBlockAndWallCollisions(b);
+          }
+        }
+
+        handleBlockAndWallCollisions(b) {
+          // Left Back Wall
+          if (b.x - b.radius <= 0) {
+            b.x = b.radius;
+            b.vx = Math.abs(b.vx);
+            this.audio.playWallHit();
+            this.particlePool.spawn(b.x, b.y, 8, '#38bdf8', 120);
+            if (b.canSpawn) {
+              b.canSpawn = false;
+              this.triggerPendingBlockSpawn('left', b.y, 0, 0, Math.floor(b.y / CELL_SIZE));
+            }
+            return;
+          }
+
+          // Right Back Wall
+          if (b.x + b.radius >= PLAYFIELD_WIDTH) {
+            b.x = PLAYFIELD_WIDTH - b.radius;
+            b.vx = -Math.abs(b.vx);
+            this.audio.playWallHit();
+            this.particlePool.spawn(b.x, b.y, 8, '#38bdf8', 120);
+            if (b.canSpawn) {
+              b.canSpawn = false;
+              this.triggerPendingBlockSpawn('right', b.y, PLAYFIELD_WIDTH, GRID_COLS - 1, Math.floor(b.y / CELL_SIZE));
+            }
+            return;
+          }
+
+          // Existing Solid Blocks Collision & Overlap Ejection Safety Net
+          const cellCol = Math.floor(b.x / CELL_SIZE);
+          const cellRow = Math.floor(b.y / CELL_SIZE);
+
+          for (let r = Math.max(0, cellRow - 1); r <= Math.min(GRID_ROWS - 1, cellRow + 1); r++) {
+            for (let c = Math.max(0, cellCol - 1); c <= Math.min(GRID_COLS - 1, cellCol + 1); c++) {
+              const cell = this.grid[r][c];
+              if (cell.solid) {
+                const slideOffset = (cell.slide && cell.slide.currentOffset) ? cell.slide.currentOffset : 0;
+                const cellLeft = c * CELL_SIZE + slideOffset;
+                const cellRight = cellLeft + CELL_SIZE;
+                const cellTop = r * CELL_SIZE;
+                const cellBottom = cellTop + CELL_SIZE;
+
+                // Fix 2: Overlap Ejection Safety Net
+                // If ball is ever overlapping or embedded inside a solid block cell, force it out toward center
+                if (
+                  b.x >= cellLeft - b.radius &&
+                  b.x <= cellRight + b.radius &&
+                  b.y >= cellTop - b.radius &&
+                  b.y <= cellBottom + b.radius
+                ) {
+                  if (c < this.medianCol) {
+                    // Left player side: eject rightwards past front edge
+                    b.x = Math.max(b.x, cellRight + b.radius + 2);
+                    b.vx = Math.abs(b.vx);
+                  } else {
+                    // Right player side: eject leftwards past front edge
+                    b.x = Math.min(b.x, cellLeft - b.radius - 2);
+                    b.vx = -Math.abs(b.vx);
+                  }
+
+                  const hitSide = c < this.medianCol ? 'left' : 'right';
+                  this.audio.playWallHit();
+                  this.particlePool.spawn(b.x, b.y, 6, cell.color, 110);
+
+                  if (b.canSpawn) {
+                    b.canSpawn = false;
+                    this.triggerPendingBlockSpawn(hitSide, b.y, b.x, c, r);
+                  }
+                  return;
+                }
+              }
+            }
+          }
+        }
+
+        triggerPendingBlockSpawn(side, impactY, impactX, impactCol, impactRow) {
+          // Select highlighted center block (Index 4) from bottom queue
+          const queueItem = this.queue[4];
+          const shape = getRotatedShape(queueItem.type, queueItem.rotation);
+
+          // Directional Queue Shift with fresh randomized shape AND rotation
+          const newBlock = {
+            type: this.randomTetromino(),
+            rotation: Math.floor(Math.random() * 4),
+          };
+
+          if (side === 'left') {
+            for (let i = 4; i > 0; i--) {
+              this.queue[i] = this.queue[i - 1];
+            }
+            this.queue[0] = newBlock;
+          } else {
+            for (let i = 4; i < 8; i++) {
+              this.queue[i] = this.queue[i + 1];
+            }
+            this.queue[8] = newBlock;
+          }
+
+          const placement = this.findPlacement(side, shape, impactY, impactX, impactCol, impactRow);
+          if (!placement) return;
+
+          this.pendingSpawns.push({
+            pieceId: this.nextPieceId++,
+            type: queueItem.type,
+            rotation: queueItem.rotation,
+            shape: shape,
+            side: side,
+            startRow: placement.startRow,
+            startCol: placement.startCol,
+            color: shape.color,
+            glow: shape.glow,
+            age: 0,
+          });
+        }
+
+        findPlacement(side, shape, impactY, impactX, impactCol, impactRow) {
+          // Step 1: Anchor to the Exact Impact Coordinate (impactCol, impactRow)
+          // Do NOT sweep inward from the Median Line, and do NOT use the global max column of the board.
+          const actualImpactRow = impactRow !== undefined ? impactRow : Math.floor(impactY / CELL_SIZE);
+
+          let actualImpactCol;
+          if (impactCol !== undefined) {
+            actualImpactCol = impactCol;
+          } else if (impactX !== undefined) {
+            actualImpactCol = Math.max(0, Math.min(GRID_COLS - 1, Math.floor(impactX / CELL_SIZE)));
+          } else {
+            // If not specified, examine only the specific rows occupied by this tetromino
+            if (side === 'left') {
+              let maxSolid = -1;
+              for (let dr = 0; dr < shape.height; dr++) {
+                for (let c = 0; c < this.medianCol; c++) {
+                  if (this.grid[actualImpactRow + dr]?.[c]?.solid && c > maxSolid) {
+                    maxSolid = c;
+                  }
+                }
+              }
+              actualImpactCol = maxSolid >= 0 ? maxSolid : 0;
+            } else {
+              let minSolid = GRID_COLS;
+              for (let dr = 0; dr < shape.height; dr++) {
+                for (let c = this.medianCol; c < GRID_COLS; c++) {
+                  if (this.grid[actualImpactRow + dr]?.[c]?.solid && c < minSolid) {
+                    minSolid = c;
+                  }
+                }
+              }
+              actualImpactCol = minSolid < GRID_COLS ? minSolid : (GRID_COLS - 1);
+            }
+          }
+
+          const isCellBlocked = (r, c) => {
+            if (this.grid[r]?.[c]?.solid) return true;
+            for (const p of this.pendingSpawns) {
+              for (const [dr, dc] of p.shape.cells) {
+                if (p.startRow + dr === r && p.startCol + dc === c) {
+                  return true;
+                }
+              }
+            }
+            return false;
+          };
+
+          // Row-Local Collision Check Only: checks the exact 4 (col, row) coordinates of the Tetromino
+          const isOverlapping = (r, c) => {
+            for (const [dr, dc] of shape.cells) {
+              const cr = r + dr;
+              const cc = c + dc;
+              if (cr < 0 || cr >= GRID_ROWS || cc < 0 || cc >= GRID_COLS) return true;
+              if (isCellBlocked(cr, cc)) return true;
+            }
+            return false;
+          };
+
+          // Flush Contact Bonus: counts exterior edges touching walls or existing blocks
+          const countTouchingEdges = (r, c) => {
+            let touching = 0;
+            const pieceCells = new Set();
+            for (const [dr, dc] of shape.cells) {
+              pieceCells.add(`${r + dr},${c + dc}`);
+            }
+
+            const DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+            for (const [dr, dc] of shape.cells) {
+              const cr = r + dr;
+              const cc = c + dc;
+              for (const [nr, nc] of DIRS) {
+                const adjR = cr + nr;
+                const adjC = cc + nc;
+                if (pieceCells.has(`${adjR},${adjC}`)) continue;
+
+                // Back wall
+                if (side === 'left' && adjC < 0) {
+                  touching++;
+                  continue;
+                }
+                if (side === 'right' && adjC >= GRID_COLS) {
+                  touching++;
+                  continue;
+                }
+
+                // Top / bottom arena walls
+                if (adjR < 0 || adjR >= GRID_ROWS) {
+                  touching++;
+                  continue;
+                }
+
+                // Existing solid or pending blocks
+                if (isCellBlocked(adjR, adjC)) {
+                  touching++;
+                }
+              }
+            }
+            return touching;
+          };
+
+          // Step 2: Find deepest valid column near impactCol for testRow
+          const evaluateRow = (testRow) => {
+            if (testRow < 0 || testRow + shape.height > GRID_ROWS) return null;
+
+            if (side === 'left') {
+              const maxAllowedCol = this.medianCol - shape.width;
+              if (maxAllowedCol < 0) return null;
+
+              let testCol = Math.max(0, Math.min(maxAllowedCol, actualImpactCol));
+
+              if (isOverlapping(testRow, testCol)) {
+                // Step outward toward center (testCol++) 1 column at a time until free of overlaps
+                while (testCol <= maxAllowedCol && isOverlapping(testRow, testCol)) {
+                  testCol++;
+                }
+                if (testCol > maxAllowedCol) {
+                  return null;
+                }
+              } else {
+                // Step backward toward back wall (testCol--) until piece touches an existing block or wall
+                while (testCol > 0 && !isOverlapping(testRow, testCol - 1)) {
+                  testCol--;
+                }
+              }
+
+              // Step 3: Score Each Valid Candidate for Maximum Fairness
+              // 1. Wall Depth Priority (Weight = 100 per column)
+              const wallDepthPenalty = testCol * 100;
+              // 2. Impact Row Proximity (Weight = 15 per row)
+              const rowPenalty = Math.abs(testRow - actualImpactRow) * 15;
+              // 3. Flush Contact Bonus (Weight = -20 per touching edge)
+              const contactBonus = countTouchingEdges(testRow, testCol) * 20;
+
+              const totalPenalty = wallDepthPenalty + rowPenalty - contactBonus;
+              return { startRow: testRow, startCol: testCol, wallDepthPenalty, rowPenalty, contactBonus, totalPenalty };
+            } else {
+              const minAllowedCol = this.medianCol;
+              const maxAllowedCol = GRID_COLS - shape.width;
+              if (minAllowedCol > maxAllowedCol) return null;
+
+              let testCol = Math.max(minAllowedCol, Math.min(maxAllowedCol, actualImpactCol));
+
+              if (isOverlapping(testRow, testCol)) {
+                // Step outward toward center (testCol--) 1 column at a time until free of overlaps
+                while (testCol >= minAllowedCol && isOverlapping(testRow, testCol)) {
+                  testCol--;
+                }
+                if (testCol < minAllowedCol) {
+                  return null;
+                }
+              } else {
+                // Step backward toward back wall (testCol++) until piece touches an existing block or wall
+                while (testCol < maxAllowedCol && !isOverlapping(testRow, testCol + 1)) {
+                  testCol++;
+                }
+              }
+
+              // Step 3: Score Each Valid Candidate for Maximum Fairness
+              // 1. Wall Depth Priority (Weight = 100 per column)
+              const distFromWall = (GRID_COLS - shape.width) - testCol;
+              const wallDepthPenalty = distFromWall * 100;
+              // 2. Impact Row Proximity (Weight = 15 per row)
+              const rowPenalty = Math.abs(testRow - actualImpactRow) * 15;
+              // 3. Flush Contact Bonus (Weight = -20 per touching edge)
+              const contactBonus = countTouchingEdges(testRow, testCol) * 20;
+
+              const totalPenalty = wallDepthPenalty + rowPenalty - contactBonus;
+              return { startRow: testRow, startCol: testCol, wallDepthPenalty, rowPenalty, contactBonus, totalPenalty };
+            }
+          };
+
+          // Step 2: Test candidate vertical positions within local window around impact point:
+          // from impactRow - 3 to impactRow + 3 (clamped so all 4 cells stay within rows 0 to 14)
+          const minRow = Math.max(0, Math.min(GRID_ROWS - shape.height, actualImpactRow - 3));
+          const maxRow = Math.max(0, Math.min(GRID_ROWS - shape.height, actualImpactRow + 3));
+
+          const candidates = [];
+          for (let r = minRow; r <= maxRow; r++) {
+            const cand = evaluateRow(r);
+            if (cand) candidates.push(cand);
+          }
+
+          // Fallback: If no candidate in [impactRow - 3, impactRow + 3], search all remaining rows
+          if (candidates.length === 0) {
+            for (let r = 0; r <= GRID_ROWS - shape.height; r++) {
+              if (r >= minRow && r <= maxRow) continue;
+              const cand = evaluateRow(r);
+              if (cand) candidates.push(cand);
+            }
+          }
+
+          if (candidates.length === 0) return null;
+
+          // Step 3: Score Each Valid Candidate for Maximum Fairness (lowest penalty score wins)
+          candidates.sort((a, b) => {
+            if (a.totalPenalty !== b.totalPenalty) return a.totalPenalty - b.totalPenalty;
+            if (a.wallDepthPenalty !== b.wallDepthPenalty) return a.wallDepthPenalty - b.wallDepthPenalty;
+            return a.rowPenalty - b.rowPenalty;
+          });
+
+          return { startRow: candidates[0].startRow, startCol: candidates[0].startCol };
+        }
+
+        updatePendingSpawns(dt) {
+          // Fix 1: Safe Distance Check
+          // Only materialize once all active balls are at least 1.5 grid cells (60px) clear
+          // AND moving away from the wall, OR after fallback timeout (2.0s)
+          const safeDistance = 60; // 1.5 cells
+
+          for (let i = this.pendingSpawns.length - 1; i >= 0; i--) {
+            const p = this.pendingSpawns[i];
+            p.age += dt;
+
+            let allBallsSafe = true;
+
+            const minX = p.startCol * CELL_SIZE;
+            const maxX = (p.startCol + p.shape.width) * CELL_SIZE;
+            const minY = p.startRow * CELL_SIZE;
+            const maxY = (p.startRow + p.shape.height) * CELL_SIZE;
+
+            for (const b of this.balls) {
+              if (!b.active) continue;
+
+              const closestX = Math.max(minX, Math.min(b.x, maxX));
+              const closestY = Math.max(minY, Math.min(b.y, maxY));
+              const dist = Math.hypot(b.x - closestX, b.y - closestY);
+
+              // Moving away from wall toward center
+              const movingAway = p.side === 'left' ? b.vx > 40 : b.vx < -40;
+
+              if (dist < safeDistance || !movingAway) {
+                allBallsSafe = false;
+                break;
+              }
+            }
+
+            if (allBallsSafe || p.age >= 2.0) {
+              // Solidify block with scale/fade-in animation
+              for (const [dr, dc] of p.shape.cells) {
+                const r = p.startRow + dr;
+                const c = p.startCol + dc;
+                if (this.grid[r]?.[c]) {
+                  this.grid[r][c].solid = true;
+                  this.grid[r][c].pieceId = p.pieceId;
+                  this.grid[r][c].shapeType = p.type;
+                  this.grid[r][c].color = p.color;
+                  this.grid[r][c].spawnAge = 0; // starts 120ms scale/fade-in
+                  this.grid[r][c].maxSpawnAge = 0.12;
+                  this.particlePool.spawn(c * CELL_SIZE + 20, r * CELL_SIZE + 20, 6, p.color, 90);
+                }
+              }
+
+              this.audio.playBlockLockIn();
+              this.screenShake = 2;
+              this.pendingSpawns.splice(i, 1);
+
+              // Match-3 same-block popping check (3 or more touching whole Tetromino pieces of same type)
+              this.checkAndPopMatch3();
+
+              this.checkFullColumns();
+            }
+          }
+        }
+
+        checkAndPopMatch3() {
+          const pieceMap = new Map();
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+              const cell = this.grid[r][c];
+              if (cell.solid && cell.pieceId !== undefined && cell.shapeType !== undefined) {
+                if (!pieceMap.has(cell.pieceId)) {
+                  pieceMap.set(cell.pieceId, {
+                    pieceId: cell.pieceId,
+                    shapeType: cell.shapeType,
+                    color: cell.color,
+                    cells: [],
+                  });
+                }
+                pieceMap.get(cell.pieceId).cells.push({ r, c });
+              }
+            }
+          }
+
+          if (pieceMap.size < 3) return;
+
+          // Build adjacency for whole pieces of the exact same shapeType/color
+          const adj = new Map();
+          for (const pid of pieceMap.keys()) {
+            adj.set(pid, new Set());
+          }
+
+          const pieces = Array.from(pieceMap.values());
+          const DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+          for (let i = 0; i < pieces.length; i++) {
+            const pA = pieces[i];
+            for (let j = i + 1; j < pieces.length; j++) {
+              const pB = pieces[j];
+              if (pA.shapeType !== pB.shapeType) continue;
+
+              let touching = false;
+              for (const cA of pA.cells) {
+                for (const [dr, dc] of DIRS) {
+                  const nr = cA.r + dr;
+                  const nc = cA.c + dc;
+                  for (const cB of pB.cells) {
+                    if (nr === cB.r && nc === cB.c) {
+                      touching = true;
+                      break;
+                    }
+                  }
+                  if (touching) break;
+                }
+                if (touching) break;
+              }
+
+              if (touching) {
+                adj.get(pA.pieceId).add(pB.pieceId);
+                adj.get(pB.pieceId).add(pA.pieceId);
+              }
+            }
+          }
+
+          // BFS connected components
+          const visited = new Set();
+          const piecesToPop = [];
+
+          for (const [pid] of pieceMap) {
+            if (visited.has(pid)) continue;
+            const comp = [];
+            const queue = [pid];
+            visited.add(pid);
+
+            while (queue.length > 0) {
+              const curr = queue.shift();
+              comp.push(curr);
+              const neighbors = adj.get(curr);
+              if (neighbors) {
+                for (const nbr of neighbors) {
+                  if (!visited.has(nbr)) {
+                    visited.add(nbr);
+                    queue.push(nbr);
+                  }
+                }
+              }
+            }
+
+            if (comp.length >= 3) {
+              piecesToPop.push(...comp);
+            }
+          }
+
+          if (piecesToPop.length === 0) return;
+
+          // Pop & Disappear:
+          let hasLeftPop = false;
+          let hasRightPop = false;
+          for (const pid of piecesToPop) {
+            const piece = pieceMap.get(pid);
+            if (!piece) continue;
+            for (const { r, c } of piece.cells) {
+              if (c < this.medianCol) hasLeftPop = true;
+              else hasRightPop = true;
+              this.particlePool.spawn(c * CELL_SIZE + 20, r * CELL_SIZE + 20, 10, piece.color, 160, 4);
+              this.grid[r][c].solid = false;
+              this.grid[r][c].pieceId = undefined;
+              this.grid[r][c].shapeType = undefined;
+              this.grid[r][c].color = undefined;
+              delete this.grid[r][c].slide;
+            }
+          }
+
+          this.audio.playBlockPop();
+          this.screenShake = 5;
+
+          // Collapse and fall-back physics for popped gaps:
+          // Left side collapses leftward toward Column 0
+          // Right side collapses rightward toward Column 29
+          if (hasLeftPop) {
+            this.performBlockCollapse('left');
+          }
+          if (hasRightPop) {
+            this.performBlockCollapse('right');
+          }
+
+          // Continuous Paddle Tracking:
+          // Update the paddle's target horizontal (X) position based on the new foremost block's X-coordinate
+          // *only after* the collapse is calculated so the paddle retreats smoothly and safely with the collapsing mass.
+          this.updatePaddleHorizontalPositions(0.016);
+        }
+
+        performBlockCollapse(side) {
+          const minC = side === 'left' ? 0 : this.medianCol;
+          const maxC = side === 'left' ? this.medianCol - 1 : GRID_COLS - 1;
+
+          // 1. Gather all intact solid pieces on this side
+          const pieceMap = new Map();
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = minC; c <= maxC; c++) {
+              const cell = this.grid[r][c];
+              if (cell.solid && cell.pieceId !== undefined) {
+                if (!pieceMap.has(cell.pieceId)) {
+                  pieceMap.set(cell.pieceId, {
+                    pieceId: cell.pieceId,
+                    shapeType: cell.shapeType,
+                    color: cell.color,
+                    cells: [],
+                  });
+                }
+                pieceMap.get(cell.pieceId).cells.push({ r, c });
+              }
+            }
+          }
+
+          if (pieceMap.size === 0) return;
+
+          // Snapshot pre-collapse positions for slide animation calculation
+          const initialPosMap = new Map();
+          for (const [pid, p] of pieceMap) {
+            initialPosMap.set(pid, p.cells.map(c => ({ r: c.r, c: c.c })));
+          }
+
+          const pieces = Array.from(pieceMap.values());
+
+          // 2. Sort pieces by proximity to the outer wall:
+          // Left side: outer wall is Col 0. Pieces with smaller minCol are closest to wall.
+          // Right side: outer wall is Col 29. Pieces with larger maxCol are closest to wall.
+          if (side === 'left') {
+            pieces.sort((a, b) => {
+              const minA = Math.min(...a.cells.map(c => c.c));
+              const minB = Math.min(...b.cells.map(c => c.c));
+              return minA - minB;
+            });
+          } else {
+            pieces.sort((a, b) => {
+              const maxA = Math.max(...a.cells.map(c => c.c));
+              const maxB = Math.max(...b.cells.map(c => c.c));
+              return maxB - maxA;
+            });
+          }
+
+          // 3. Cascade shifts toward wall until no piece can shift further
+          let movedAny = true;
+          while (movedAny) {
+            movedAny = false;
+            for (const p of pieces) {
+              let maxShift = 0;
+
+              while (true) {
+                const testShift = maxShift + 1;
+                let canShift = true;
+
+                for (const { r, c } of p.cells) {
+                  const newC = side === 'left' ? c - testShift : c + testShift;
+
+                  if (side === 'left') {
+                    if (newC < 0) {
+                      canShift = false;
+                      break;
+                    }
+                  } else {
+                    if (newC >= GRID_COLS) {
+                      canShift = false;
+                      break;
+                    }
+                  }
+
+                  const targetCell = this.grid[r]?.[newC];
+                  // Blocked if solid and belongs to a DIFFERENT piece
+                  if (targetCell && targetCell.solid && targetCell.pieceId !== p.pieceId) {
+                    canShift = false;
+                    break;
+                  }
+                }
+
+                if (canShift) {
+                  maxShift = testShift;
+                } else {
+                  break;
+                }
+              }
+
+              if (maxShift > 0) {
+                movedAny = true;
+                const deltaCol = side === 'left' ? -maxShift : maxShift;
+
+                // Collect cell data before moving
+                const cellData = [];
+                for (const { r, c } of p.cells) {
+                  cellData.push({ fromR: r, fromC: c, data: { ...this.grid[r][c] } });
+                }
+
+                // Clear old positions
+                for (const { r, c } of p.cells) {
+                  this.grid[r][c] = { solid: false };
+                }
+
+                // Apply new positions
+                const newCells = [];
+                for (const item of cellData) {
+                  const newC = item.fromC + deltaCol;
+                  this.grid[item.fromR][newC] = {
+                    ...item.data,
+                    solid: true,
+                  };
+                  newCells.push({ r: item.fromR, c: newC });
+                }
+
+                p.cells = newCells;
+              }
+            }
+          }
+
+          // 4. Set up smooth slide animations (~200ms duration, within 150ms-250ms range)
+          for (const [pid, p] of pieceMap) {
+            const origCells = initialPosMap.get(pid);
+            if (!origCells || origCells.length === 0) continue;
+
+            const deltaCol = p.cells[0].c - origCells[0].c;
+            if (deltaCol !== 0) {
+              const startOffset = -deltaCol * CELL_SIZE;
+              for (const { r, c } of p.cells) {
+                this.grid[r][c].slide = {
+                  startOffset: startOffset,
+                  currentOffset: startOffset,
+                  duration: 0.20, // 200ms
+                  elapsed: 0,
+                  side: side,
+                };
+              }
+            }
+          }
+        }
+
+        updateSlidingBlocks(dt) {
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+              const cell = this.grid[r][c];
+              if (cell && cell.solid && cell.slide) {
+                cell.slide.elapsed += dt;
+                const progress = Math.min(1, cell.slide.elapsed / cell.slide.duration);
+                // Ease-out cubic: 1 - (1 - p)^3 for satisfying physical fall-back
+                const ease = 1 - Math.pow(1 - progress, 3);
+                cell.slide.currentOffset = cell.slide.startOffset * (1 - ease);
+
+                // Anti-Stuck Push Force (Ball Physics):
+                // If any sliding block makes contact with a ball during this horizontal collapse phase,
+                // gently push the ball out in the direction of the median line and force its horizontal
+                // velocity vector (vx) to face the center, ensuring the ball is never trapped.
+                const blockLeft = c * CELL_SIZE + cell.slide.currentOffset;
+                const blockRight = blockLeft + CELL_SIZE;
+                const blockTop = r * CELL_SIZE;
+                const blockBottom = blockTop + CELL_SIZE;
+
+                for (const b of this.balls) {
+                  if (!b.active) continue;
+
+                  if (
+                    b.x + b.radius >= blockLeft &&
+                    b.x - b.radius <= blockRight &&
+                    b.y + b.radius >= blockTop &&
+                    b.y - b.radius <= blockBottom
+                  ) {
+                    if (c < this.medianCol) {
+                      // Left side block sliding leftward toward wall: push ball rightward toward center
+                      b.x = Math.max(b.x, blockRight + b.radius + 2);
+                      b.vx = Math.max(Math.abs(b.vx), 240); // force vx facing center
+                    } else {
+                      // Right side block sliding rightward toward wall: push ball leftward toward center
+                      b.x = Math.min(b.x, blockLeft - b.radius - 2);
+                      b.vx = -Math.max(Math.abs(b.vx), 240); // force vx facing center
+                    }
+                    this.particlePool.spawn(b.x, b.y, 4, cell.color || '#38bdf8', 75);
+                  }
+                }
+
+                if (progress >= 1) {
+                  delete cell.slide;
+                }
+              }
+            }
+          }
+        }
+
+        checkFullColumns() {
+          for (let c = 0; c < GRID_COLS; c++) {
+            if (!this.columnClaimed[c]) {
+              let isFull = true;
+              for (let r = 0; r < GRID_ROWS; r++) {
+                if (!this.grid[r][c].solid) {
+                  isFull = false;
+                  break;
+                }
+              }
+
+              if (isFull) {
+                this.columnClaimed[c] = true;
+                const isLeft = c < this.medianCol;
+
+                if (isLeft) {
+                  this.medianCol = Math.min(GRID_COLS - 2, this.medianCol + 1);
+                } else {
+                  this.medianCol = Math.max(1, this.medianCol - 1);
+                }
+                this.medianX = this.medianCol * CELL_SIZE;
+
+                this.audio.playFanfare();
+                this.screenShake = 6;
+                for (let r = 0; r < GRID_ROWS; r++) {
+                  this.particlePool.spawn(c * CELL_SIZE + 20, r * CELL_SIZE + 20, 4, '#fbbf24', 160);
+                }
+              }
+            }
+          }
+        }
+
+        updatePaddleHorizontalPositions(dt) {
+          let maxColP1 = -1;
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < this.medianCol; c++) {
+              if (this.grid[r][c].solid && c > maxColP1) {
+                maxColP1 = c;
+              }
+            }
+          }
+          const furthestX_P1 = maxColP1 >= 0 ? (maxColP1 + 1) * CELL_SIZE : 0;
+          this.paddle1.targetX = furthestX_P1 + PADDLE_DISTANCE_FROM_BLOCKS;
+
+          let minColP2 = GRID_COLS;
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = this.medianCol; c < GRID_COLS; c++) {
+              if (this.grid[r][c].solid && c < minColP2) {
+                minColP2 = c;
+              }
+            }
+          }
+          const furthestX_P2 = minColP2 < GRID_COLS ? minColP2 * CELL_SIZE : PLAYFIELD_WIDTH;
+          this.paddle2.targetX = furthestX_P2 - PADDLE_DISTANCE_FROM_BLOCKS - this.paddle2.width;
+
+          // Smooth 150-200ms fluid interpolation (lerp) toward target X
+          const lerpFactor = Math.min(1, dt * 7.0);
+          this.paddle1.x += (this.paddle1.targetX - this.paddle1.x) * lerpFactor;
+          this.paddle2.x += (this.paddle2.targetX - this.paddle2.x) * lerpFactor;
+        }
+
+        checkDefeatConditions() {
+          const p1InnerEdge = this.paddle1.x + this.paddle1.width;
+          const p2InnerEdge = this.paddle2.x;
+
+          if (p1InnerEdge >= this.medianX) {
+            this.triggerDefeat('p1');
+          } else if (p2InnerEdge <= this.medianX) {
+            this.triggerDefeat('p2');
+          }
+        }
+
+        showGameOverModal() {
+          const overlay = document.getElementById('game-over-overlay');
+          const title = document.getElementById('go-winner-title');
+          const topBar = document.getElementById('top-hud-bar');
+
+          // Completely hide top controls (Audio, Pause, Fullscreen) on Win / Game Over screen
+          if (topBar) {
+            topBar.classList.add('hidden');
+          }
+
+          if (overlay && title) {
+            // Minimal End Screen: "Left Wins!" or "Right Wins!"
+            title.textContent = this.winner === 'Left' ? 'LEFT WINS!' : 'RIGHT WINS!';
+            overlay.classList.remove('hidden');
+          }
+        }
+
+        // --- Rendering Pipeline ---
+        draw() {
+          const ctx = this.ctx;
+
+          if (this.state === 'zoom_defeat') {
+            this.renderZoomDefeat(ctx);
+            return;
+          }
+
+          if (this.state === 'game_over') {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            return;
+          }
+
+          ctx.save();
+          if (this.screenShake > 0) {
+            const shakeX = (Math.random() - 0.5) * this.screenShake * 3;
+            const shakeY = (Math.random() - 0.5) * this.screenShake * 3;
+            ctx.translate(shakeX, shakeY);
+          }
+
+          // 1. Playfield Arena Background & Grid
+          ctx.fillStyle = '#070913';
+          ctx.fillRect(0, 0, PLAYFIELD_WIDTH, PLAYFIELD_HEIGHT);
+
+          this.drawGridLines(ctx);
+
+          // 2. Solid Blocks & Column Clears (with 120ms scale/fade-in)
+          this.drawBlocks(ctx);
+
+          // 3. Pending Ghost Blocks (Anti-Collision Delay Wireframes)
+          this.drawPendingGhosts(ctx);
+
+          // 4. Clean Median Line (without P1/P2 Territory text or Rally count)
+          this.drawMedianLine(ctx);
+
+          // 5. Paddles
+          this.drawPaddles(ctx);
+
+          // 6. Balls
+          this.drawBalls(ctx);
+
+          // 7. Visual Particles
+          this.particlePool.draw(ctx);
+
+          // 8. Clean Bottom 9-Block Preview HUD (No text labels, rotated blocks)
+          this.drawBottomHUD(ctx);
+
+          // 9. Standardized Uniform Playfield Blue Border (Continuous around all 4 sides: top, bottom, left, right)
+          this.drawPlayfieldBorder(ctx);
+
+          // 10. Freeze State Visual (Silent, No Visible Countdown Timer)
+          if (this.state === 'freeze_alarm') {
+            this.drawFreezeAlarmOverlay(ctx);
+          }
+
+          ctx.restore();
+        }
+
+        drawPlayfieldBorder(ctx) {
+          ctx.save();
+          const borderWidth = 3;
+          const half = borderWidth / 2; // 1.5px inset ensures full 3px stroke fits cleanly inside without edge clipping
+
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = borderWidth;
+          ctx.lineJoin = 'miter';
+          ctx.miterLimit = 10;
+
+          // Glowing pass for uniform neon glow across all 4 edges
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.strokeRect(half, half, PLAYFIELD_WIDTH - borderWidth, PLAYFIELD_HEIGHT - borderWidth);
+
+          // Crisp core pass for solid, 100% uniform opaque border lines
+          ctx.shadowBlur = 0;
+          ctx.strokeRect(half, half, PLAYFIELD_WIDTH - borderWidth, PLAYFIELD_HEIGHT - borderWidth);
+
+          ctx.restore();
+        }
+
+        drawGridLines(ctx) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+          ctx.lineWidth = 1;
+
+          for (let c = 0; c <= GRID_COLS; c++) {
+            ctx.beginPath();
+            ctx.moveTo(c * CELL_SIZE, 0);
+            ctx.lineTo(c * CELL_SIZE, PLAYFIELD_HEIGHT);
+            ctx.stroke();
+          }
+          for (let r = 0; r <= GRID_ROWS; r++) {
+            ctx.beginPath();
+            ctx.moveTo(0, r * CELL_SIZE);
+            ctx.lineTo(PLAYFIELD_WIDTH, r * CELL_SIZE);
+            ctx.stroke();
+          }
+        }
+
+        drawBlocks(ctx) {
+          for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+              const cell = this.grid[r][c];
+              if (cell.solid) {
+                const slideOffset = (cell.slide && cell.slide.currentOffset) ? cell.slide.currentOffset : 0;
+                const x = c * CELL_SIZE + slideOffset;
+                const y = r * CELL_SIZE;
+                const color = cell.color;
+
+                ctx.save();
+                // 120ms smooth scale/fade-in when newly materialized
+                if (cell.spawnAge < cell.maxSpawnAge) {
+                  const progress = Math.min(1, cell.spawnAge / cell.maxSpawnAge);
+                  const scale = 0.5 + 0.5 * progress;
+                  ctx.globalAlpha = 0.4 + 0.6 * progress;
+                  ctx.translate(x + CELL_SIZE / 2, y + CELL_SIZE / 2);
+                  ctx.scale(scale, scale);
+                  ctx.translate(-(x + CELL_SIZE / 2), -(y + CELL_SIZE / 2));
+                }
+
+                // Base block fill
+                ctx.fillStyle = color;
+                ctx.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+
+                // Beveled top/left highlight
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                ctx.fillRect(x + 1, y + 1, CELL_SIZE - 2, 4);
+                ctx.fillRect(x + 1, y + 1, 4, CELL_SIZE - 2);
+
+                // Beveled bottom/right shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.fillRect(x + 1, y + CELL_SIZE - 5, CELL_SIZE - 2, 4);
+                ctx.fillRect(x + CELL_SIZE - 5, y + 1, 4, CELL_SIZE - 2);
+
+                ctx.restore();
+              }
+            }
+          }
+
+          // Render claimed column glowing aura
+          for (let c = 0; c < GRID_COLS; c++) {
+            if (this.columnClaimed[c]) {
+              const x = c * CELL_SIZE;
+              ctx.save();
+              ctx.fillStyle = 'rgba(234, 179, 8, 0.12)';
+              ctx.fillRect(x, 0, CELL_SIZE, PLAYFIELD_HEIGHT);
+              ctx.strokeStyle = '#eab308';
+              ctx.lineWidth = 1.5;
+              ctx.strokeRect(x + 1, 1, CELL_SIZE - 2, PLAYFIELD_HEIGHT - 2);
+              ctx.restore();
+            }
+          }
+        }
+
+        drawPendingGhosts(ctx) {
+          const pulse = (Math.sin(Date.now() * 0.01) + 1) * 0.5;
+          for (const p of this.pendingSpawns) {
+            ctx.save();
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = 2;
+            ctx.fillStyle = p.glow;
+            ctx.globalAlpha = 0.3 + pulse * 0.35;
+
+            for (const [dr, dc] of p.shape.cells) {
+              const x = (p.startCol + dc) * CELL_SIZE;
+              const y = (p.startRow + dr) * CELL_SIZE;
+              ctx.fillRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+              ctx.strokeRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+            }
+            ctx.restore();
+          }
+        }
+
+        drawMedianLine(ctx) {
+          ctx.save();
+          const mx = this.medianX;
+
+          // Subtle clean arena background tint
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.02)';
+          ctx.fillRect(0, 0, PLAYFIELD_WIDTH, PLAYFIELD_HEIGHT);
+
+          const isGameOverSequence = (this.state === 'freeze_alarm' || this.state === 'zoom_defeat' || this.state === 'game_over');
+
+          if (isGameOverSequence) {
+            // Keep Median Line solid white on Game Over throughout freeze and zoom sequence
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 6;
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 12;
+            ctx.setLineDash([]);
+          } else {
+            // Glowing dashed median line
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 12;
+            ctx.setLineDash([16, 12]);
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(mx, 0);
+          ctx.lineTo(mx, PLAYFIELD_HEIGHT);
+          ctx.stroke();
+
+          // Clean playfield: P1/P2 Territory text & Rally count removed!
+          ctx.restore();
+        }
+
+        drawPaddles(ctx) {
+          // Left Paddle
+          ctx.save();
+          ctx.fillStyle = this.paddle1.color;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(this.paddle1.x, this.paddle1.y, this.paddle1.width, this.paddle1.height);
+
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.6)';
+          ctx.fillRect(this.paddle1.x + this.paddle1.width - 3, this.paddle1.y, 3, this.paddle1.height);
+          ctx.restore();
+
+          // Right Paddle (Unified styling identical to Left Paddle)
+          ctx.save();
+          ctx.fillStyle = this.paddle2.color;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(this.paddle2.x, this.paddle2.y, this.paddle2.width, this.paddle2.height);
+
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.6)';
+          ctx.fillRect(this.paddle2.x, this.paddle2.y, 3, this.paddle2.height);
+          ctx.restore();
+        }
+
+        drawBalls(ctx) {
+          for (const b of this.balls) {
+            if (!b.active) continue;
+            ctx.save();
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = b.canSpawn ? '#38bdf8' : '#e2e8f0';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = b.canSpawn ? '#38bdf8' : '#94a3b8';
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.radius * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        drawBottomHUD(ctx) {
+          const hudY = PLAYFIELD_HEIGHT;
+          ctx.fillStyle = '#0a0d17';
+          ctx.fillRect(0, hudY, CANVAS_WIDTH, HUD_HEIGHT);
+
+          // 9-Block Queue layout: clean preview, no text labels
+          const slotWidth = 110;
+          const startX = (CANVAS_WIDTH - 9 * slotWidth) / 2;
+          const slotCenterY = hudY + 60;
+
+          // Highlight arch/circle around slot 4
+          const centerSlotX = startX + 4 * slotWidth + slotWidth / 2;
+          ctx.save();
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 3;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 15;
+
+          ctx.beginPath();
+          ctx.arc(centerSlotX, slotCenterY, 46, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+
+          // Render each upcoming Tetromino accurately rotated
+          for (let i = 0; i < 9; i++) {
+            const item = this.queue[i];
+            const def = getRotatedShape(item.type, item.rotation);
+            const slotCenterX = startX + i * slotWidth + slotWidth / 2;
+
+            if (def) {
+              const miniCellSize = i === 4 ? 16 : 12;
+              const totalW = def.width * miniCellSize;
+              const totalH = def.height * miniCellSize;
+              const pieceOriginX = slotCenterX - totalW / 2;
+              const pieceOriginY = slotCenterY - totalH / 2;
+
+              ctx.save();
+              ctx.fillStyle = def.color;
+              if (i === 4) {
+                ctx.shadowColor = def.color;
+                ctx.shadowBlur = 8;
+              }
+
+              for (const [dr, dc] of def.cells) {
+                const cx = pieceOriginX + dc * miniCellSize;
+                const cy = pieceOriginY + dr * miniCellSize;
+                ctx.fillRect(cx + 1, cy + 1, miniCellSize - 2, miniCellSize - 2);
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillRect(cx + 1, cy + 1, miniCellSize - 2, 2);
+                ctx.fillStyle = def.color;
+              }
+              ctx.restore();
+            }
+          }
+        }
+
+        drawFreezeAlarmOverlay(ctx) {
+          // 2.5-Second Silent Freeze: Clean playfield boundary without red border/vignette/flash
+          ctx.save();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(this.medianX, 0);
+          ctx.lineTo(this.medianX, PLAYFIELD_HEIGHT);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        renderZoomDefeat(ctx) {
+          const duration = this.zoomDuration || 2.2;
+          const t = Math.min(1, this.zoomTimer / duration);
+          // Smooth ease-in-out cubic interpolation
+          const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+          const targetX = this.zoomTarget.x;
+          const targetY = this.zoomTarget.y;
+          // Smoothly pan camera center from viewport center (CANVAS_WIDTH/2, CANVAS_HEIGHT/2) to losing paddle center
+          const curCamX = (CANVAS_WIDTH / 2) + (targetX - CANVAS_WIDTH / 2) * ease;
+          const curCamY = (CANVAS_HEIGHT / 2) + (targetY - CANVAS_HEIGHT / 2) * ease;
+          // Smoothly scale from 1.0 to 160.0 so the white paddle covers 100% of the screen
+          const scale = 1.0 + ease * 159.0;
+
+          ctx.save();
+          // Transform camera to center on interpolated focus point
+          ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+          ctx.scale(scale, scale);
+          ctx.translate(-curCamX, -curCamY);
+
+          // Keep entire game board rendered normally on screen:
+          // 1. Playfield Arena Background & Grid
+          ctx.fillStyle = '#070913';
+          ctx.fillRect(0, 0, PLAYFIELD_WIDTH, PLAYFIELD_HEIGHT);
+          this.drawGridLines(ctx);
+
+          // 2. Solid Blocks & Pending Ghosts
+          this.drawBlocks(ctx);
+          this.drawPendingGhosts(ctx);
+
+          // 3. Median Line
+          this.drawMedianLine(ctx);
+
+          // 4. Winning Paddle
+          if (this.losingSide === 'p1') {
+            ctx.save();
+            ctx.fillStyle = this.paddle2.color;
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 10;
+            ctx.fillRect(this.paddle2.x, this.paddle2.y, this.paddle2.width, this.paddle2.height);
+            ctx.restore();
+          } else {
+            ctx.save();
+            ctx.fillStyle = this.paddle1.color;
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 10;
+            ctx.fillRect(this.paddle1.x, this.paddle1.y, this.paddle1.width, this.paddle1.height);
+            ctx.restore();
+          }
+
+          // 5. Balls & Particles
+          this.drawBalls(ctx);
+          this.particlePool.draw(ctx);
+
+          // 6. Bottom HUD & Playfield Border
+          this.drawBottomHUD(ctx);
+          this.drawPlayfieldBorder(ctx);
+
+          // 7. Expanding White Losing Paddle
+          // Physically expands across the canvas under camera zoom, naturally covering and painting over arena
+          const losingPaddle = this.losingSide === 'p1' ? this.paddle1 : this.paddle2;
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 24;
+          ctx.fillRect(losingPaddle.x, losingPaddle.y, losingPaddle.width, losingPaddle.height);
+          ctx.restore();
+
+          ctx.restore();
+
+          // Once expanding white paddle reaches 100% full screen cover, ensure solid pure white canvas
+          if (ease >= 0.98) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          }
+        }
+      }
+
+      // 6. Resilient Game Loop Initializer
+      window.addEventListener('unhandledrejection', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+      });
+      window.addEventListener('error', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+      });
+
+      function initTetraPong() {
+        if (window.game) return;
+        const canvas = document.getElementById('gameCanvas');
+        if (!canvas) {
+          requestAnimationFrame(initTetraPong);
+          return;
+        }
+
+        try {
+          const game = new TetraPongGame();
+          window.game = game;
+
+          let lastTime = performance.now();
+          function loop(now) {
+            try {
+              const dt = (now - lastTime) / 1000;
+              lastTime = now;
+
+              game.update(dt);
+              game.draw();
+            } catch (loopErr) {
+              // Resilient loop recovery
+            }
+
+            requestAnimationFrame(loop);
+          }
+          requestAnimationFrame(loop);
+        } catch (err) {
+          console.error('TetraPong initialization error:', err);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTetraPong);
+      } else {
+        initTetraPong();
+      }
+    </script>
+  </body>
+</html>
